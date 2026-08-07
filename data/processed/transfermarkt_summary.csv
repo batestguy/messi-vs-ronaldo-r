@@ -1,0 +1,21 @@
+player_name,season,transfer_date,team_from,team_to,market_value,transfer_value,transfer_type
+Cristiano Ronaldo,95/96,1995-07-01,Andorinha Yth.,Nacional Yth.,NA,0,Free transfer
+Cristiano Ronaldo,96/97,1996-07-01,Nacional Yth.,Nacional U15,NA,NA,NA
+Cristiano Ronaldo,97/98,1997-07-01,Nacional U15,Sporting Sub-15,NA,2000,Transfer
+Cristiano Ronaldo,98/99,1998-07-01,Sporting Sub-15,Sporting U17,NA,NA,NA
+Cristiano Ronaldo,00/01,2000-07-01,Sporting U17,Sporting U19,NA,NA,NA
+Cristiano Ronaldo,02/03,2002-07-01,Sporting U19,Sporting,NA,NA,NA
+Cristiano Ronaldo,03/04,2003-08-12,Sporting,Man Utd,NA,19000000,Transfer
+Cristiano Ronaldo,09/10,2009-07-06,Man Utd,Real Madrid,60000000,94000000,Transfer
+Cristiano Ronaldo,18/19,2018-07-10,Real Madrid,Juventus,100000000,117000000,Transfer
+Cristiano Ronaldo,21/22,2021-08-31,Juventus,Man Utd,45000000,17000000,Transfer
+Cristiano Ronaldo,22/23,2022-11-22,Man Utd,Without Club,20000000,NA,NA
+Cristiano Ronaldo,22/23,2023-01-01,Without Club,Al-Nassr,20000000,NA,NA
+Lionel Messi,00/01,2000-07-01,Newell's JV,Barça Youth,NA,0,Free transfer
+Lionel Messi,02/03,2002-07-01,Barça Youth,Barça U16,NA,NA,NA
+Lionel Messi,03/04,2003-09-13,Barça U16,Barça U19,NA,NA,NA
+Lionel Messi,03/04,2003-11-28,Barça U19,Barcelona C,NA,NA,NA
+Lionel Messi,03/04,2004-03-05,Barcelona C,Barcelona B,NA,NA,NA
+Lionel Messi,05/06,2005-07-01,Barcelona B,Barcelona,3000000,NA,NA
+Lionel Messi,21/22,2021-08-10,Barcelona,PSG,80000000,0,Free transfer
+Lionel Messi,23/24,2023-07-15,PSG,Miami,35000000,0,Free transfer

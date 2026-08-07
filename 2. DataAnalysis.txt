@@ -1,0 +1,259 @@
+STAGE 2: DESCRIPTIVE STATISTICS, WEIGHTING, ANALYSIS & DASHBOARD STRATEGY
+Objective: Transform raw goal data into a statistically robust, interactive web application that compares weighted goal performance, all while keeping an eye on reproducible R-based Docker deployment.
+
+SECTION 1: DATA PREPARATION FOR ANALYSIS
+1.1 Core Principle: The "Goal as a Unit of Analysis"
+Each row in the goals_master table represents a single goal. All weighting and descriptive statistics originate from this grain. However, we must aggregate intelligently for comparison (e.g., comparing total weighted goals requires normalizing by playing time, because both players have different career lengths).
+
+1.2 Critical Transformations Required Before Analysis
+Transformation	Purpose	Methodological Reason
+Stoppage Time Handling	Convert "45'+3'" to numeric (e.g., 48)	Minute weights require a continuous scale; stoppage time goals (90'+5') are inherently high-pressure but need consistent numeric treatment.
+Match Outcome (Win/Draw/Loss)	Binary/Ordinal encoding based on result and final_score	We use this later to validate our weights (did weighted goals actually correlate with winning?).
+Normalization / Per-90	Divide total weighted goals by (Minutes Played / 90)	Crucial: Messi and Ronaldo have different career lengths. Comparing raw totals unfairly favors longevity. We must compare Weighted Goals per 90 minutes to measure efficiency.
+Elo Imputation	Assign proxy ratings for missing Elo data (e.g., early career or obscure clubs)	Use a 3-step fallback: (1) Current Club Elo, (2) League average Elo, (3) Global average Elo (1500). Never drop rows, as early career goals are vital for trajectory analysis.
+Defining the "Era"	Create a categorical variable: Pre-2010, 2010-2014, 2015-2019, Post-2020	This allows us to check if the weighting model is consistent across eras or if one player dominated a specific epoch.
+1.3 Data Integrity & Outlier Screening
+Screening: Identify outliers (e.g., a goal assigned an xG > 0.9 vs an Elo rating of 2200). However, do not remove them automatically. In football, scoring a tap-in against a prime Elo 2100 team is a real data point. Instead, flag them with a leverage score for sensitivity analysis.
+
+What to Avoid: Do not standardize (z-score) the dependent variable (goals) globally before weighting. Standardization destroys the count nature of goals. Keep raw goal counts and apply weights multiplicatively.
+
+1.4 Recommended R Packages for Preparation
+dplyr & tidyr (Core data manipulation).
+
+lubridate (Handling match dates).
+
+stringr (Parsing complicated minute strings).
+
+janitor (Cleaning column names).
+
+naniar (Visualizing missing data patterns to justify imputation).
+
+SECTION 2: DESCRIPTIVE SUMMARY STATISTICS ("The Table 1")
+Before weighting, we establish the baseline narrative. This provides the context that the dashboard will display before the user applies weights.
+
+2.1 The "Baseline Snapshot" Table
+For each player, generate a summary table containing:
+
+Volume: Total matches played, total minutes, total raw goals.
+
+Context Distribution: Percentage of goals scored in Domestic Leagues vs. Knockout vs. Friendlies.
+
+Variability: Standard deviation of goals per match (shows consistency).
+
+Dependency: Penalty goals as a percentage of total goals.
+
+Opposition Landscape: Average Opponent Elo faced over the career.
+
+Peak: Season with the highest goals-per-90.
+
+2.2 Trajectory Analysis (Longitudinal Summaries)
+Plot rolling averages (e.g., 50-match rolling window) of goals per 90. This highlights:
+
+Who peaked earlier?
+
+Who suffered steeper declines?
+
+2.3 Correlation Check (Pre-Weighting)
+Examine the correlation between raw goals and contextual factors (Opponent Elo, Venue, Competition type).
+
+Crucial insight: If raw goals already show a strong negative correlation with Opponent Elo (i.e., both score less against high-Elo teams), the weighting will heavily punish high-Elo goals. We must check if this correlation is identical for both players. If one player has a flatter slope (scores equally well against high and low Elo), they are truly "clutch."
+
+2.4 Packages & Methodological "What to Avoid"
+Packages: gtsummary (for elegant Table 1s), psych (for descriptive stats), skimr (for rapid overview).
+
+Avoid: Publishing unweighted totals as the primary metric. Do not let the dashboard default to "Total Goals" first; default to "Weighted Goals per 90" to immediately set the correct statistical narrative.
+
+Avoid: Binning continuous Opponent Elo into "Strong/Weak" for descriptive plots. It loses granularity. Use scatterplots with loess smoothing instead.
+
+SECTION 3: THE WEIGHTING MECHANISM (FAMD/PCA)
+Based on our earlier discussion, we abandoned manual multiplicative weights and are committed to a data-driven approach using FAMD (Factor Analysis of Mixed Data).
+
+3.1 Why FAMD over Standard PCA (Recap)
+Our dataset contains a mix of continuous (Opponent Elo) and categorical (Venue: H/A/N; Competition Stage: Group/Knockout/Final) variables. Standard PCA treats categorical variables as numeric dummies, artificially inflating variance for categories with rare events (e.g., Finals). FAMD balances the inertia between continuous and categorical variables, ensuring the "Difficulty Index" is democratically derived from all context types.
+
+3.2 The Methodology: Building the Index
+Input Selection: We exclude the "Goal" variable and the "Player" name from the FAMD algorithm. We only input the match context: Opponent_Elo, Venue, Competition_Stage, and Is_Away.
+
+Global Fit: Run FAMD on the combined dataset (both players' matches). We fit it globally to ensure a universal definition of "Match Difficulty" that applies to both players equally.
+
+Extraction: Extract the loadings of Dimension 1 (Dim 1). Dim 1 will naturally capture the maximum variance. Because Opponent Elo and Knockout Stage are highly correlated, Dim 1 mathematically becomes the "Seriousness/Difficulty" axis.
+
+Projection: Use the coefficients (loadings) from the global FAMD to predict a continuous Difficulty_Score for every single goal scored by both players.
+
+The Weighted Goal Value: Multiply the binary (1) goal by this Difficulty_Score. So, a goal against Real Madrid (Elo 2048) in a UCL Semi-final gets a score ~1.8, while a goal against a relegation team (Elo 1400) in a friendly gets ~0.4.
+
+3.3 Sensitivity Analysis for the Dashboard
+The FAMD is fixed, but we include a "K-parameter" slider in the dashboard (range 0.5 to 3.0) that exponentiates the Difficulty Score (Score ^ K). This allows the user to amplify or dampen the effect of difficulty on the final weighted total, effectively letting them stress-test the conclusion.
+
+3.4 Critical "What to Avoid"
+Do not include the player's team quality (e.g., Real Madrid/Barcelona Elo) in the FAMD. If you include team quality, you are statistically penalizing goals scored early in their career (when they played for weaker Sporting/Barcelona sides) or later in their career (Inter Miami/Saudi). We want to measure opposition difficulty, not team support.
+
+Do not run separate FAMDs for Messi and Ronaldo. Different correlation structures would make the indices non-comparable (Apples vs. Oranges).
+
+3.5 Recommended R Packages for Weighting
+FactoMineR (Core package for FAMD; heavy but essential).
+
+factoextra (For visualizing the eigenvalue scree plot and variable contributions in the dashboard).
+
+Ensure these packages are pure R (no external system libraries like Java) – good for Docker.
+
+SECTION 4: STATISTICAL INFERENCE & COMPARISON
+4.1 The Hypotheses
+H0: The mean Weighted Goals per 90 for Messi equals the mean for Ronaldo.
+
+H1: The means are significantly different.
+
+4.2 Why Bootstrapping over T-Tests?
+The distribution of goals per match is heavily zero-inflated and right-skewed. A standard t-test assumes normality. Bootstrapping resamples the matches (with replacement) to build an empirical distribution of the difference of the means. This is distribution-free and robust to outliers.
+
+4.3 The Bootstrapping Methodology
+Take the full dataset of matches (not goals, but matches).
+
+Resample 10,000 times with replacement, maintaining the same sample size.
+
+For each resample, calculate the Weighted Goals per 90 for Messi and Ronaldo.
+
+Record the difference (Messi - Ronaldo).
+
+Plot the histogram of the 10,000 differences.
+
+4.4 Interpretation & Visualization
+Confidence Intervals: Calculate the 2.5% and 97.5% percentiles of the bootstrap distribution. If Zero is not in this interval, we claim statistical significance.
+
+Effect Size: Compute Cohen's d (standardized difference) on the bootstrap means. This tells us how large the difference is, not just if there is one. A small p-value with a tiny Cohen's d (e.g., 0.1) is practically meaningless—we must report both.
+
+4.5 Additional Inferential Tests
+Subgroup Analysis: Run the bootstrap separately for:
+
+Knockout matches only (Who is more clutch?)
+
+League matches only (Who is more consistent against parity?)
+
+Trajectory Slopes: Use a simple linear regression on the weighted-goal rolling averages to test if the decline slope for Ronaldo is significantly steeper than Messi's (or vice versa) via an interaction term.
+
+4.6 Packages & "What to Avoid"
+Packages: boot (classic), or rsample (tidymodels ecosystem) + infer (for tidy bootstrapping). For Cohen's d: effectsize.
+
+Avoid: Using p-values as binary "Significant/Not Significant" flags in the dashboard. Instead, present the full Bootstrap Density Plot and let the user visually see the overlap. Avoid adjusting p-values for multiple comparisons (e.g., Bonferroni) in an exploratory dashboard—it overly penalizes discovery.
+
+SECTION 5: DASHBOARD ARCHITECTURE (SHINY)
+5.1 Layout Strategy (Mobile/Desktop Ready)
+Sidebar (Left, 25%): User controls (Sliders for K-parameter, Toggles for Subsetting by Competition Type, Era filters).
+
+Main Panel (Right, 75%): Tabbed structure:
+
+Tab 1: Overview (KPI boxes for weighted goals, raw goals, matches).
+
+Tab 2: The Weighting Mechanism (Scree plot, variable contributions, explanation text).
+
+Tab 3: Head-to-Head (Primary plots).
+
+Tab 4: Bootstrapping (Inference plots).
+
+Tab 5: Raw Data (DT data table for transparency).
+
+5.2 Reactivity & Performance (Docker Mindset)
+Reactive Caching: Calculating weighted scores for ~2,000 goals (Messi + Ronaldo total) is computationally cheap (~0.5 seconds). However, re-running the bootstrap (10,000 iterations) on every slider change will freeze the app.
+
+Solution: Use reactiveVal() to store the pre-computed FAMD scores. The slider only changes a multiplier applied to these stored scores. The bootstrap is only recalculated when the user explicitly clicks an "Update Analysis" button, not on every slider drag.
+
+5.3 Recommended R Packages for Dashboard
+shiny (Core framework).
+
+bslib (Modern theming; use blue/red color scheme for Messi/Ronaldo).
+
+shinyWidgets (Beautiful sliders and toggle switches).
+
+DT (Interactive data tables).
+
+plotly (Interactive plots; allows zooming and hovering for exact values).
+
+waiter (Provides loading screens; essential for Docker containers with slightly slower startup times).
+
+5.4 Docker Consideration for Shiny
+R Packages vs. System Dependencies: shiny and plotly are R-heavy. However, ggplot2 (underlying plotly) depends on systemfonts and textshaping, which require system libraries like libfreetype6-dev. These must be explicitly added to your Dockerfile.
+
+Strategy: Use the rocker/shiny-verse base image. It comes pre-baked with tidyverse and shiny, minimizing system dependency headaches. Avoid shinydashboard (heavy JavaScript) and use bslib + shiny.fluent alternatives for a cleaner, lighter UI.
+
+SECTION 6: VISUALIZATION STRATEGY (The Definitive Plot List)
+The dashboard must tell the "Weighted Goal Story" clearly. These are the exact plots to implement:
+
+6.1 The "Table of Life" (KPI Cards)
+Top row of the dashboard: Display four large numbers:
+
+Messi's Weighted Index (Total)
+
+Ronaldo's Weighted Index (Total)
+
+Messi's Weighted Goals per 90
+
+Ronaldo's Weighted Goals per 90
+(Bold the one that is currently higher based on the filter parameters).
+
+6.2 Plot 1: The "Reality Check" Bar Chart
+Type: Grouped Bar Chart.
+
+X-axis: Player.
+
+Y-axis: Goals.
+
+Bars: Raw Goals (Unweighted) next to Weighted Goals.
+
+Why: This immediately visualizes how much weighting changes the narrative. If the gap in Raw is 50 goals, but the gap in Weighted is 10 goals (or reversed), it proves our weighting is doing its job.
+
+6.3 Plot 2: The Career Trajectory (Loess Smoothed)
+Type: Line Chart with Confidence Bands.
+
+X-axis: Age (not season, to normalize timelines).
+
+Y-axis: Weighted Goals per 90 (Rolling 30-match average).
+
+Why: Highlights peaks and declines. We can add a vertical line at Age 30 to show longevity. Interactivity: Hover shows exact match context.
+
+6.4 Plot 3: The Difficulty Distribution (Density)
+Type: Density Ridgeline or Overlaid Density Plot.
+
+X-axis: Weighted Score per Goal.
+
+Color: Red (Ronaldo) vs Blue (Messi).
+
+Why: Shows the composition of goals. A density shifted to the right (higher difficulty) means the player scores more high-leverage goals. A density piled on the left means they score many easy goals.
+
+6.5 Plot 4: Opponent Quality Scatter
+Type: Jittered Scatter Plot.
+
+X-axis: Opponent Elo.
+
+Y-axis: Goals per 90 (calculated for matches grouped by Elo bins).
+
+Overlay: Loess trend lines for both players.
+
+Why: Proves who is the "big-game" player. If Ronaldo's line is above Messi's at Elo > 2000, but below at Elo < 1700, the narrative is clear.
+
+6.6 Plot 5: Penalty Dependency
+Type: Stacked Bar (Penalty vs Open Play).
+
+Why: Weighting must account for Penalties being easier (lower xG). This plot shows the breakdown so users understand why one player's weighted score might drop if they have significantly more penalties.
+
+6.7 Plot 6: The Bootstrap Distribution (The Verdict)
+Type: Histogram with a vertical reference line at Zero.
+
+X-axis: Bootstrap Difference (Messi - Ronaldo) in Weighted Goals per 90.
+
+Shading: Highlight the 95% Confidence Interval.
+
+Why: This is the ultimate statistical output. If the entire highlight is to the right of zero, the app declares Messi superior (or vice versa). If it crosses zero, it declares a statistical dead heat.
+
+SECTION 7: DOCKER OPTIMIZATION CONSIDERATIONS (THE THINKING)
+Since we are containerizing everything, keep these structural decisions in mind during the analysis phase:
+
+Pre-compute the FAMD: Do not run the computationally intensive FAMD inside the Shiny app. Pre-run it locally, extract the loadings, and save them as a .rds file. The Docker container only needs to load the .rds and apply the multiplication—saving memory and CPU.
+
+Renviron / Renv: Use renv to snapshot the exact package versions. This ensures that the FAMD loadings (which depend on FactoMineR's internal scaling) are perfectly reproducible inside the container.
+
+Data Size: The final goals_master dataset is tiny (< 1 MB). We can embed it directly inside the R package or data/ folder within the image. No need for external volume mounts for the static data.
+
+Plots Caching: Use shiny::bindCache() on the renderPlot outputs. If the K-parameter doesn't change, the plot doesn't re-render, saving server resources.
+
+Avoid Heavy Text Analysis: Do not use tidytext or NLP libraries inside the container—they pull in tm and Java dependencies (rJava). We are sticking purely to numerical and statistical visualizations.
+

@@ -1,0 +1,32 @@
+# --- R session state ---
+.Rhistory
+.RData
+.Rproj.user/
+
+# --- renv internals (library is project-local cache, not source) ---
+renv/library/
+renv/staging/
+renv/local/
+renv/cache/
+
+# --- Scraped/downloaded data (large, immutable; reproducible by re-running scripts) ---
+data/raw/
+data/external/
+
+# data/processed/ is tracked (small, primary deliverable).
+# club_elo_lookup.csv is 33MB intermediate, reproducible via 04 -- not tracked.
+data/processed/club_elo_lookup.csv
+
+# --- Secrets (never commit) ---
+kaggle.json
+.env
+*.pem
+secrets/
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.tmp
+*.log

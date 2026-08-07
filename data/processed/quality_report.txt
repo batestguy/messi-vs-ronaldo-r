@@ -1,0 +1,30 @@
+MESSI vs RONALDO - Phase 1 quality report
+Generated: 2026-08-07 04:26:56 WAT
+
+== Goals (spec 6.1: Messi ~950+, Ronaldo ~1030+) ==
+  Messi: 847  | Ronaldo: 891  (FBref records; spec targets are indicative)
+
+== Matches ==
+  Total valid appearances: 2201 (1031 Messi / 1170 Ronaldo)
+  Scoreless appearances kept for FAMD/per-90: 1063
+
+== Elo coverage ==
+  Direct (club/national): 1808
+  League-average fallback: 186
+  Global 1500 fallback: 207
+
+== Match-context gaps ==
+  Goals without match-log context (2026 WC knockout, match-log snapshot earlier): 3
+
+== xG coverage ==
+  Understat xG goals: 483 (27.8% of goals; limited to 2014+ top-5 leagues)
+  Missing xG (documented gap): 1255
+
+== FAMD ==
+  Global FAMD on all valid matches (both players).
+  Inputs: Opponent_Elo, Venue, Competition_Stage, Is_Away.
+  Difficulty_Score = standardized Dim 1 (higher = harder).
+
+== Per-90 (Weighted Goals / Total Minutes) ==
+  C. Ronaldo: 0.038 weighted / 0.836 raw
+  Lionel Messi: 0.134 weighted / 0.895 raw
