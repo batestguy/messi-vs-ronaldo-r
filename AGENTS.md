@@ -4,8 +4,9 @@ Guidance for OpenCode/AI agents in this repo. Read before writing code.
 
 ## What this repo is
 
-- **In build — Phase 1 (data collection) in progress.** The four `.txt` files are the authoritative spec, and their **numeric prefixes are the build-phase order**: `Goals and desires and build plan.txt` (vision), `1. Datacollection info.txt`, `2. DataAnalysis.txt`, `3. Containerization.txt`. Read in numbered order before generating code; don't contradict them without surfacing the conflict.
+- **Phase 1 (data collection) is COMPLETE and committed (git `a3c0a7f`).** Next milestone = Phase 2 (Shiny dashboard). The four `.txt` files are the authoritative spec, and their **numeric prefixes are the build-phase order**: `Goals and desires and build plan.txt` (vision), `1. Datacollection info.txt`, `2. DataAnalysis.txt`, `3. Containerization.txt`. Read in numbered order before generating code; don't contradict them without surfacing the conflict.
 - **No Kaggle CSVs.** The original spec's "quick win" manual Kaggle downloads were dropped — everything is scraped directly (goal-level data comes from FBref's own goal-log pages, which cover club + international).
+- **Primary deliverable:** `data/processed/goals_master_final.csv` (1,738 goals, one row/goal) built by `scripts/07_integrate_data.R` from the raw scrapes. See `data/data_dictionary.md` for columns and `.opencode/plans/wave-a-handoff.md` for the full project history + decisions.
 
 ## Stack & environment
 
