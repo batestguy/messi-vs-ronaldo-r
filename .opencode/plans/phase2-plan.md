@@ -1,6 +1,6 @@
 # Phase 2 — Interactive Dashboard (Messi vs Ronaldo)
 
-Status: **APPROVED** (user approved plan; wave-by-wave review model).
+Status: **Wave 1 complete; awaiting review for Wave 2** (user-approved wave-by-wave review model).
 Phase 1 complete: `a3c0a7f` (pipeline) + `016ff08` (docs). Working tree clean at start of Phase 2.
 
 ## Deliverable
@@ -36,7 +36,7 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 
 ## Waves (build order + review gates)
 
-### Wave 0 — Prep & data (current)
+### Wave 0 — Prep & data (complete, commit `92271d9`)
 - **`scripts/08_prepare_analysis.R`** → `data/processed/analysis_bundle.rds`:
   - `bundle$goals` — goal-level rows (theme-ready: era labels, penalty flag, xG, difficulty, weighted).
   - `bundle$matches` — match-context rows (for per-90 denominator + bootstrap; includes scoreless).
@@ -48,7 +48,7 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 - **Photos**: download CC-licensed images (Wikimedia Commons) with fallback; ATTRIBUTIONS.md.
 - **Smoke check**: app boots locally (script exits after "Listening on..." + one HTTP GET).
 
-### Wave 1 — Overview
+### Wave 1 — Overview (complete, pending commit in current handoff)
 - 4 KPI cards (Weighted Goals per 90, Raw Goals, Minutes, Appearances — leader bolded), intro panels (motivation, existing approaches, what we built), photos. `mod_overview.R`.
 
 ### Wave 2 — Weighting (core methodology tab)

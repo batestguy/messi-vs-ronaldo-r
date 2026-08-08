@@ -1,5 +1,5 @@
 # app/app.R — Messi vs Ronaldo: weighted-difficulty dashboard (Phase 2).
-# Run locally:  Rscript --no-init-file --no-restore --no-save app/app.R
+# Run locally:  Rscript --no-init-file --no-restore --no-save app/run.R
 # Then browse http://127.0.0.1:3838
 #
 # Runtime deps: shiny/bslib/plotly/DT/data.table (user library on Win — NOT renv).
@@ -41,7 +41,7 @@ ui <- page_navbar(
                     "Messi vs Ronaldo — The Weighted Case"),
   theme = app_theme(),
   id = "main_tabs",
-  tags$head(tags$link(rel = "stylesheet", href = "css.css")),
+  header = tags$head(tags$link(rel = "stylesheet", href = "css.css")),
   sidebar = sidebar(
     open = TRUE,
     title = "Global controls",
