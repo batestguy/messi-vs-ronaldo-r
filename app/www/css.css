@@ -1,0 +1,9 @@
+/* app/www/css.css — small visual refinements on top of Flatly */
+.kpi-card { border: 0; }
+.kpi-head { border-bottom: 1px solid #edf0f5; }
+.kpi-title { letter-spacing: .05em; text-transform: uppercase; }
+.kpi-value { font-weight: 800; }
+.navbar { box-shadow: 0 1px 3px rgba(23,32,42,.08); }
+.tab-content { padding-top: 1rem; }
+.sidebar { background: #f8fafc; }
+.lead-badge { font-size: .8rem; vertical-align: middle; }
