@@ -48,7 +48,7 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 - **Photos**: download CC-licensed images (Wikimedia Commons) with fallback; ATTRIBUTIONS.md.
 - **Smoke check**: app boots locally (script exits after "Listening on..." + one HTTP GET).
 
-### Wave 1 — Overview (complete, pending commit in current handoff)
+### Wave 1 — Overview (complete, commit `4450c03`)
 - 4 KPI cards (Weighted Goals per 90, Raw Goals, Minutes, Appearances — leader bolded), intro panels (motivation, existing approaches, what we built), photos. `mod_overview.R`.
 
 ### Wave 2 — Weighting (core methodology tab)
