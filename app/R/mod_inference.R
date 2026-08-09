@@ -14,6 +14,6 @@ mod_inference_ui <- function(id) {
   )
 }
 
-mod_inference_server <- function(id, bundle, state) {
+mod_inference_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {})
 }

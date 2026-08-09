@@ -14,6 +14,6 @@ mod_methodology_ui <- function(id) {
   )
 }
 
-mod_methodology_server <- function(id, bundle, state) {
+mod_methodology_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {})
 }

@@ -67,8 +67,9 @@ kpi_card <- function(title, value, sub = NULL, accent = NULL) {
 }
 
 lead_badge <- function(player, label) {
-  badge(paste0("Leads: ", label), class = "lead-badge",
-        style = sprintf("background:%s;color:#fff;", P_COLOR[player]))
+  span(class = "badge lead-badge",
+       style = sprintf("background:%s;color:#fff;", P_COLOR[[player]]),
+       paste0("Leads: ", label))
 }
 
 p_text <- function(...) p(class = "text-muted", ...)

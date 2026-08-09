@@ -14,6 +14,6 @@ mod_head2head_ui <- function(id) {
   )
 }
 
-mod_head2head_server <- function(id, bundle, state) {
+mod_head2head_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {})
 }

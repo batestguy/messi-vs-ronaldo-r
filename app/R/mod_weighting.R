@@ -13,6 +13,6 @@ mod_weighting_ui <- function(id) {
   )
 }
 
-mod_weighting_server <- function(id, bundle, state) {
+mod_weighting_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {})
 }

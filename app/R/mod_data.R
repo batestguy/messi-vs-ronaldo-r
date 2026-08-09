@@ -13,6 +13,6 @@ mod_data_ui <- function(id) {
   )
 }
 
-mod_data_server <- function(id, bundle, state) {
+mod_data_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {})
 }
