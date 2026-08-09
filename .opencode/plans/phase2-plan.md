@@ -11,7 +11,7 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 
 1. **Layout-first, not blog-first.** The dashboard is built now; blog conversion is a much later phase. Every tab is a module so content can be reused later.
 2. **Weighted metrics are the front.** Default metric = Weighted Goals per 90. Raw goals are only the "Reality Check" comparison.
-3. **shinyapps.io** is the deploy target via `rsconnect`. Dockerfile still produced for reproducibility (Wave 7).
+3. **shinyapps.io** is the deploy target via `rsconnect`. Dockerfile still produced for reproducibility (Wave 7). Note `rsconnect` builds its **own** manifest by scanning app source against the installed libraries — it does **not** read `renv.lock`. That is why the lockfile gap (see Wave 7.0) blocks Wave 7 but not Wave 8.
 4. **Wave-by-wave review**: after each wave, stop and summarize; proceed only after approval.
 5. **Photos**: CC-licensed Wikimedia Commons images (`app/www/img/`) with graceful fallback; `app/www/ATTRIBUTIONS.md` documents sources.
 
@@ -19,7 +19,7 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 
 - ONE global FAMD on both players' matches. Inputs only: `Opponent_Elo`, `Venue`, `Competition_Stage`, `Is_Away`. `Difficulty_Score` = standardized Dim 1 (oriented higher = harder). `Weighted_Goal = 1 × Difficulty_Score`.
 - Never re-run FAMD in the app — load `famd_loadings.rds` + the pre-joined `Difficulty_Score` columns.
-- K-slider (0.5–3.0) **exponentiates stored scores** (`Score ^ K`) — pure UI math, no recomputation.
+- K-slider (0.5–3.0) applies a **signed power** to the stored scores — `sign(Score) * abs(Score)^K` — pure UI math, no recomputation. **Never plain `Score ^ K`**: roughly half the difficulty scores are negative and a negative base with a fractional exponent yields `NaN`.
 - Never drop rows on missing Elo (fallback chain: club → league-average → global 1500).
 - Never filter to goal-scoring matches only; per-90 denominator uses ALL valid minutes (incl. 1,063 scoreless of 2,201).
 - No binning of continuous Opponent Elo (scatter + loess).
@@ -73,8 +73,35 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 ### Wave 6 — Polish
 - Loader UX (waiter), `bindCache()` per plot, mobile responsive layout, final visual pass.
 
+### Wave 7.0 — Repair `renv.lock` (BLOCKS Wave 7)
+
+**Problem.** `renv.lock` holds 69 packages and contains **none** of `shiny`, `bslib`, `data.table`, `htmltools`, `plotly`, `DT`, or `FactoMineR`. It is a Phase-1-only lockfile, snapshotted before the dashboard existed. So:
+
+- `3. Containerization.txt:64` has the Docker build run `renv::restore()` — today that yields a container with **no shiny in it**, which cannot start the app.
+- `3. Containerization.txt:68` justifies renv specifically as *"A minor FactoMineR update could change your loadings and therefore your weighted scores. renv freezes the statistical methodology."* **FactoMineR is not in the lock**, so that guarantee is not currently delivered.
+
+**Repair.** Snapshot *from* the user library — this avoids copying 163 MB into the pathologically slow renv library on this machine:
+
+```r
+renv::snapshot(
+  library = "C:/Users/TOSHIBA/AppData/Local/R/win-library/4.5",
+  type    = "implicit"   # scans app/*.R + scripts/*.R for library() calls
+)
+```
+
+The canonical alternative is `renv::hydrate()` then `renv::snapshot()` — correct, but slow here. Note that plain `renv::snapshot()` **alone does nothing useful**: under an active renv `.libPaths()` is the project library, where shiny isn't installed, so it finds nothing to record.
+
+**Acceptance checks:**
+
+- [ ] `renv.lock` gains `shiny`, `bslib`, `htmltools`, `data.table`, `plotly`, `DT`, `FactoMineR`.
+- [ ] **`worldfootballR` still resolves to GitHub `RemoteSha: 72af453f9eea` and has NOT been rewritten to a CRAN entry.** This is the main risk of re-snapshotting — the package is archived and the pin is load-bearing.
+- [ ] `FactoMineR` added to `R/_packages.R` so the FAMD pin the spec promises has a declared source.
+- [ ] Working tree committed first (`renv.lock` is tracked); review the lockfile diff, don't assume it.
+- [ ] Day-to-day workflow unchanged afterwards — still `Rscript --no-init-file --no-restore --no-save`.
+
 ### Wave 7 — Docker
 - `Dockerfile` (rocker/shiny-verse:4.5.0 pinned, multi-stage, non-root, HEALTHCHECK, port 3838) + `.dockerignore`; include only bundle + app; no worldfootballR/FactoMineR at runtime.
+- **Prerequisite: Wave 7.0 above must be done first**, or `renv::restore()` builds an app-less image.
 
 ### Wave 8 — Deploy
 - `scripts/09_deploy_shinyapps.R` (rsconnect), deploy, verify live URL.

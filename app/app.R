@@ -6,11 +6,11 @@
 # No worldfootballR / FactoMineR at runtime: everything is precomputed in
 #   data/processed/analysis_bundle.rds by scripts/08_prepare_analysis.R.
 
+# Only what Wave 1 needs. plotly/DT are heavy and load lazily in the modules
+# that use them (mod_weighting / mod_data) in later waves.
 suppressPackageStartupMessages({
   library(shiny)
   library(bslib)
-  library(plotly)
-  library(DT)
   library(data.table)
 })
 
@@ -47,7 +47,10 @@ ui <- page_navbar(
     title = "Global controls",
     sliderInput("k_power", "Difficulty exponent (K)",
                 min = 0.5, max = 3, value = 1, step = 0.1),
-    helpText("Weighted goal = Difficulty_Score ^ K. K = 1 is the base weighting."),
+    # Signed power, not a plain exponent: about half the difficulty scores are
+    # negative, and a negative base with a fractional K returns NaN.
+    helpText("Weighted goal = sign(Difficulty_Score) × |Difficulty_Score| ^ K. ",
+             "K = 1 is the base weighting."),
     checkboxInput("exclude_pen", "Exclude penalty goals", value = FALSE),
     actionButton("run_boot", "Update analysis", class = "btn-primary w-100"),
     hr(),

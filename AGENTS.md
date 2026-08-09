@@ -2,6 +2,25 @@
 
 Guidance for OpenCode/AI agents in this repo. Read before writing code.
 
+## START HERE — read this before you touch anything
+
+**This file is the single source of truth for this repo.** If any other document
+contradicts it, this file wins — surface the conflict, do not silently pick one.
+(The four root `.txt` files remain the authoritative *spec*; where the build has
+deliberately diverged from them, it is annotated below rather than overwritten.)
+
+1. **Run everything with `--no-init-file`, NOT renv:**
+   `Rscript --no-init-file --no-restore --no-save <script>`. The renv library on
+   this machine loads packages pathologically slowly. See *Stack & environment*.
+2. **Launch the app only via `app/run.R`**, never `Rscript app/app.R` — the latter
+   404s every static asset in `app/www/`.
+3. **The K-slider is a SIGNED power: `sign(x) * abs(x)^K`.** Plain `x^K` returns
+   `NaN` on the negative difficulty scores.
+4. **Stop after each wave and summarize.** Do not chain waves; the user reviews each one.
+5. **`renv.lock` is Phase-1-only and INCOMPLETE** — it has no shiny and no
+   FactoMineR. Do not trust it for Docker or deploy until the Wave 7.0 repair task
+   in `.opencode/plans/phase2-plan.md` is done.
+
 ## What this repo is
 
 - **Phase 1 (data collection) is COMPLETE and committed (git `a3c0a7f`).** **Phase 2 (Shiny dashboard) is IN PROGRESS** — see `.opencode/plans/phase2-plan.md` for the wave plan (0–8) and `.opencode/plans/phase2-handoff.md` for the current resume point; after each wave there is a review gate. The four `.txt` files are the authoritative spec, and their **numeric prefixes are the build-phase order**: `Goals and desires and build plan.txt` (vision), `1. Datacollection info.txt`, `2. DataAnalysis.txt`, `3. Containerization.txt`. Read them in numbered order before generating code; don't contradict them without surfacing the conflict.
@@ -10,11 +29,33 @@ Guidance for OpenCode/AI agents in this repo. Read before writing code.
 
 ## Stack & environment
 
-- **R 4.5.2** (`rocker/shiny-verse:4.5.0` pinned for Docker). `renv.lock` is the real manifest — `r_packages.csv` is only a partial reference snapshot.
+- **R 4.5.2** (`rocker/shiny-verse:4.5.0` pinned for Docker). `r_packages.csv` is only a partial reference snapshot, never a manifest.
+- **`renv.lock` is a Phase-1-only lockfile and is currently INCOMPLETE.** It holds 69 packages and contains **none** of `shiny`, `bslib`, `data.table`, `htmltools`, `plotly`, `DT`, or `FactoMineR` — it was snapshotted before the dashboard existed. Two consequences: (a) a Docker build running `renv::restore()` today produces a container that cannot start the app; (b) `3. Containerization.txt:68` justifies renv as the thing that freezes FactoMineR so FAMD loadings can't drift, and FactoMineR is not in the lock, so that guarantee is not currently delivered. **Repair is tracked as Wave 7.0** in `.opencode/plans/phase2-plan.md` — do it before Wave 7, not during.
 - `worldfootballR` is **unmaintained/archived (Sep 2025); CRAN version stale** — pinned to GitHub commit `72af453f9eea` in `renv.lock`. Never install from CRAN. `kickR` (GitHub `ed583cdb047d`) is **deferred** — it imports RSelenium (heavy); re-enable only if `fb_*` fails (see `R/_packages.R`).
 - **Runtime env gotcha (Win, this machine):** the renv library path (`renv/library/windows/...`) loads packages extremely slowly or hangs (`library(worldfootballR)` from there hung >5 min). The **default user library** `C:/Users/TOSHIBA/AppData/Local/R/win-library/4.5` is fast and already has rvest/dplyr/readr/httr/chromote — use `Rscript --no-init-file --no-restore --no-save` (no renv) for scripts that don't need `worldfootballR`. `worldfootballR` exists only in the renv library (see `.opencode/plans/phase2-plan.md` + handoff notes for Phase 1 gotchas).
 - `chromote` is a **runtime dependency** — FBref is behind a Cloudflare managed challenge that plain `httr`/`rvest` cannot pass.
-- Use **`renv`** for locking; never `install.packages()` unversioned in the Dockerfile. Prefer `bslib` + `shiny.fluent`; avoid `shinydashboard` (heavy JS) and `rJava`/text-analysis libs.
+- Use **`renv`** for locking in the **Dockerfile only**; never `install.packages()` unversioned there. renv is **not** used for local development (see the runtime gotcha above) and is **not** the shinyapps.io mechanism — `rsconnect` builds its own manifest by scanning app source against the installed libraries, so Wave 8 does not read `renv.lock`.
+- Avoid `shinydashboard` (heavy JS) and `rJava`/text-analysis libs. **On `shiny.fluent`:** the spec recommends it (`2. DataAnalysis.txt:176`, `3. Containerization.txt:353`), but the build is **bslib-only** — `shiny.fluent` is not installed and not used anywhere in `app/`. Deliberate divergence; **do not add it.**
+
+### Where renv actually lives
+
+| Piece | Path | Size |
+|---|---|---|
+| Project library | `D:\MessivsRonaldoR\renv\library\windows\R-4.5\x86_64-w64-mingw32` | 163.4 MB, 79 pkgs — gitignored, real directories (not junctions) |
+| Global cache | `C:\Users\TOSHIBA\AppData\Local\R\cache\R\renv` | 44.2 MB — on C:, outside the repo |
+| Lockfile | `D:\MessivsRonaldoR\renv.lock` | tracked in git |
+
+`worldfootballR` exists in **both** the renv library and the user library (installed there from the pinned commit — see `.opencode/plans/wave-a-handoff.md` §5), so the scrapers run fine with `--no-init-file` too.
+
+### Launching the dashboard
+
+**Always `app/run.R`, never `Rscript app/app.R`.** `run.R` calls `shiny::runApp(appDir = ...)` so Shiny serves `app/www/` as static assets; launched via `app.R` the stylesheet and player images 404. It also guards the three ways this launch fails (renv on the library path, wrong working directory, port 3838 already held by an earlier instance).
+
+```powershell
+Rscript --no-init-file --no-restore --no-save app/run.R   # http://127.0.0.1:3838
+```
+
+Restart the process after code changes, then refresh the browser.
 
 ## Phase 1 pipeline (all scraping — no manual downloads)
 
@@ -34,12 +75,16 @@ Guidance for OpenCode/AI agents in this repo. Read before writing code.
 - **FAMD, not PCA** — chosen because the data mixes continuous (Opponent Elo) and categorical (Venue, Competition Stage).
 - **Run ONE global FAMD** on the combined dataset of both players. Never per-player FAMDs — indices become non-comparable.
 - **FAMD inputs are only:** `Opponent_Elo`, `Venue`, `Competition_Stage`, `Is_Away`. **Exclude** the goal count, the player name, and the player's **own** team Elo (it penalizes early/late-career goals).
-- `Difficulty_Score = Dim 1 loadings`; `Weighted Goal = 1 × Difficulty_Score`. The **K-parameter slider (0.5–3.0)** exponentiates (`Score ^ K`) for sensitivity stress-testing — it is not part of the base weights.
+- `Difficulty_Score = Dim 1 loadings`; `Weighted Goal = 1 × Difficulty_Score`. The **K-parameter slider (0.5–3.0)** applies a **signed power** for sensitivity stress-testing — it is not part of the base weights:
+  ```r
+  sign(Difficulty_Score) * abs(Difficulty_Score)^K
+  ```
+  **Never plain `Difficulty_Score ^ K`** — difficulty scores are centred and roughly half are negative, and a negative base with a fractional exponent returns `NaN`. Already documented at `scripts/08_prepare_analysis.R:18-19`.
 - **Do not z-score** goals before weighting — it destroys the count nature. Keep raw counts; weights are multiplicative.
 - **Do not drop rows** with missing Elo. Impute via fallback: Club Elo → league-average Elo → global 1500.
 - **Do not bin** continuous Opponent Elo into Strong/Weak for plots — use scatter + loess.
 - **Bootstrap at the MATCH level** (not goal level), 10,000 resamples with replacement, record the difference (Messi − Ronaldo) in Weighted Goals per 90. CI = 2.5/97.5 percentiles.
-- **NEVER filter to goal-scoring matches only** — ~47% of appearances (1,065 of 2,263) are scoreless. The FAMD, the per-90 denominator, and the match-level bootstrap all need the FULL match set. Flow: match logs (all appearances incl. scoreless) → ONE global FAMD on all matches → Difficulty_Score joined to goal-level rows (only Goals ≥ 1 get weighted) → per-90 = sum(Weighted Goals) / sum(Minutes across ALL valid matches). The 12 header-junk rows (Gls == "Gls") and 47 DNP rows (no minutes) are dropped, but zero-goal appearances are kept.
+- **NEVER filter to goal-scoring matches only** — **48.3% of appearances (1,063 of 2,201) are scoreless** (verified against `match_context.rds`). Note 2,263 is the *raw* match-log row count and 2,201 the cleaned count — they are not interchangeable. The FAMD, the per-90 denominator, and the match-level bootstrap all need the FULL match set. Flow: match logs (all appearances incl. scoreless) → ONE global FAMD on all matches → Difficulty_Score joined to goal-level rows (only Goals ≥ 1 get weighted) → per-90 = sum(Weighted Goals) / sum(Minutes across ALL valid matches). The 12 header-junk rows (Gls == "Gls") and 47 DNP rows (no minutes) are dropped, but zero-goal appearances are kept.
 - **Do not present p-values as binary flags** and do **not** Bonferroni-adjust in the exploratory dashboard — show the full bootstrap density.
 - **Dashboard default metric = Weighted Goals per 90**, never Raw Goals (Raw is only the "Reality Check" comparison).
 - **Shiny performance:** store pre-computed FAMD scores in a `reactiveVal()`; the K-slider only multiplies them; the bootstrap runs **only** on an explicit "Update Analysis" button click (not on slider drag — freezes the app). Use `shiny::bindCache()` on `renderPlot`.

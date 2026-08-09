@@ -50,8 +50,14 @@ Validated with Playwright at the local URL:
 
 After user approval, begin **Wave 2 — Weighting**:
 
-1. Live K-sensitivity chart using the signed-power transform.
+1. Live K-sensitivity chart using the signed-power transform `sign(x) * abs(x)^K`. **Not `x^K`** — that returns `NaN` on the negative difficulty scores. Several docs previously stated the wrong form; corrected 2026-08-09.
 2. Reality Check comparison of raw vs weighted per-90 rates.
 3. Difficulty distribution and goal-count-by-difficulty view.
+
+## Open finding — `renv.lock` is incomplete (2026-08-09)
+
+`renv.lock` is a Phase-1-only lockfile: 69 packages, none of them `shiny`, `bslib`, `data.table`, `htmltools`, `plotly`, `DT` or `FactoMineR`. Consequences: a Docker `renv::restore()` builds an image that cannot start the app, and the FactoMineR freeze that `3. Containerization.txt:68` cites as renv's whole purpose isn't in place.
+
+Not urgent — local dev never touches renv and shinyapps.io/`rsconnect` builds its own manifest. Tracked as **Wave 7.0** in `phase2-plan.md`; must be done before Wave 7.
 
 Keep the app running for review. Restart after code changes with `app/run.R`, then refresh the browser.

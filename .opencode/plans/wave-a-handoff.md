@@ -2,9 +2,29 @@
 
 _Last updated: 2026-08-07 (after commit `a3c0a7f`). Re-read before resuming._
 
-This is the single source of truth for the project's history, decisions, gotchas,
-and current state. AGENTS.md holds the concise operational rules; this file holds
-the full detail.
+This is the record of the project's **Phase 1** history, decisions, and gotchas.
+**`AGENTS.md` is now the single source of truth** for current operational rules —
+where the two disagree, AGENTS.md wins.
+
+> ### Corrections (2026-08-09) — this document is a historical record, left intact
+>
+> Two claims below have since been superseded. They are **not** edited in place,
+> so this file stays a faithful record of what was believed at the time:
+>
+> - **§9, line ~186 — "K-slider exponentiates (`Score ^ K`)".** Wrong. The
+>   transform is a **signed power**, `sign(Score) * abs(Score)^K`. Roughly half
+>   the difficulty scores are negative, and a negative base with a fractional
+>   exponent returns `NaN`. Correct form is in `AGENTS.md` and
+>   `scripts/08_prepare_analysis.R:18-19`.
+> - **§3.6 / §5, line ~64 — "renv.lock stays the manifest of record for Docker only".**
+>   True in intent, but `renv.lock` was never updated for Phase 2: it holds 69
+>   Phase-1 packages and none of `shiny`, `bslib`, `data.table`, `htmltools`,
+>   `plotly`, `DT` or `FactoMineR`. As written it cannot serve Docker either.
+>   Repair tracked as **Wave 7.0** in `.opencode/plans/phase2-plan.md`.
+>
+> Also note §2/§7 use **2,263** for the *raw* match-log row count; the *cleaned*
+> appearance count is **2,201**, of which **1,063 (48.3%)** are scoreless. Both
+> numbers are correct in context — do not use them interchangeably.
 
 ---
 
