@@ -11,7 +11,7 @@
 #   - HTML cache under data/raw/html_cache/ so re-runs don't re-scrape (spec 3.4).
 #   - Scrape logger -> data/raw/scrape_log.csv  (every attempt, success or fail).
 #
-# Depends on: httr, curl, digest, readr, here  (all in renv.lock)
+# Depends on: httr, curl, digest, readr, here  (all in the user library)
 # Does NOT depend on worldfootballR / kickR.
 # ---------------------------------------------------------------------------
 

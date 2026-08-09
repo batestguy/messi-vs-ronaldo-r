@@ -20,7 +20,10 @@ where the two disagree, AGENTS.md wins.
 >   True in intent, but `renv.lock` was never updated for Phase 2: it holds 69
 >   Phase-1 packages and none of `shiny`, `bslib`, `data.table`, `htmltools`,
 >   `plotly`, `DT` or `FactoMineR`. As written it cannot serve Docker either.
->   Repair tracked as **Wave 7.0** in `.opencode/plans/phase2-plan.md`.
+>   **Resolved by removing renv altogether** — `renv.lock`, `renv/` and `.Rprofile`
+>   were deleted on 2026-08-09, so every renv reference below is historical.
+>   Commands are now plain `Rscript <script>`; Docker pins by dated Posit PPM
+>   snapshot. See *On renv* in `AGENTS.md` before reinstating anything.
 >
 > Also note §2/§7 use **2,263** for the *raw* match-log row count; the *cleaned*
 > appearance count is **2,201**, of which **1,063 (48.3%)** are scoreless. Both

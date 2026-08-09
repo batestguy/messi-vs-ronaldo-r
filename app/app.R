@@ -1,8 +1,8 @@
 # app/app.R — Messi vs Ronaldo: weighted-difficulty dashboard (Phase 2).
-# Run locally:  Rscript --no-init-file --no-restore --no-save app/run.R
+# Run locally:  Rscript app/run.R
 # Then browse http://127.0.0.1:3838
 #
-# Runtime deps: shiny/bslib/plotly/DT/data.table (user library on Win — NOT renv).
+# Runtime deps: shiny/bslib/plotly/DT/data.table — the whole app stack.
 # No worldfootballR / FactoMineR at runtime: everything is precomputed in
 #   data/processed/analysis_bundle.rds by scripts/08_prepare_analysis.R.
 

@@ -3,12 +3,6 @@
 .RData
 .Rproj.user/
 
-# --- renv internals (library is project-local cache, not source) ---
-renv/library/
-renv/staging/
-renv/local/
-renv/cache/
-
 # --- Scraped/downloaded data (large, immutable; reproducible by re-running scripts) ---
 data/raw/
 data/external/

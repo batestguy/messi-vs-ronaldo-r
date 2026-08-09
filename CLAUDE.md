@@ -12,27 +12,24 @@ Current status: Phase 1 (scraping pipeline) complete; Phase 2 (Shiny dashboard) 
 
 ## Commands
 
-Windows runtime gotcha that dictates every command below: the renv library (`renv/library/windows/...`) loads packages pathologically slowly on this machine (`library(worldfootballR)` hung >5 min). The default user library `C:/Users/TOSHIBA/AppData/Local/R/win-library/4.5` is fast and has rvest/dplyr/readr/httr/chromote/shiny/bslib. So **anything that doesn't need `worldfootballR` runs with `--no-init-file`** (which skips `.Rprofile` → skips `renv/activate.R`).
+Plain `Rscript` everywhere — no flags. There is no `.Rprofile` and no environment manager; every package resolves from the user library `C:/Users/TOSHIBA/AppData/Local/R/win-library/4.5`. (renv was removed on 2026-08-09; if you see `--no-init-file` in an older note, it is stale — it existed only to skip `renv/activate.R`.)
 
 ```powershell
 # Run the dashboard (from repo root, NOT `Rscript app/app.R` — see below)
-Rscript --no-init-file --no-restore --no-save app/run.R      # serves http://127.0.0.1:3838
+Rscript app/run.R                        # serves http://127.0.0.1:3838
 
 # Rebuild the analysis bundle the app consumes
-Rscript --no-init-file --no-restore --no-save scripts/08_prepare_analysis.R
+Rscript scripts/08_prepare_analysis.R
 
-# Phase 1 scrapers — these DO need worldfootballR, so renv must activate (no --no-init-file)
-Rscript scripts/02_scrape_fbref.R        # requires headful Chrome; see below
+# Phase 1 scrapers (need worldfootballR + headful Chrome — see below)
+Rscript scripts/02_scrape_fbref.R
 Rscript scripts/03_scrape_understat.R
 Rscript scripts/04_collect_elo_ratings.R
 Rscript scripts/05_scrape_transfermarkt.R
 Rscript scripts/07_integrate_data.R
-
-# renv
-Rscript -e 'renv::snapshot(confirm = FALSE)'   # after editing R/_packages.R
 ```
 
-`R/_packages.R` is not sourced at runtime — it exists only to give `renv::snapshot()` the dependency list. Add a package there, snapshot, commit `renv.lock`. `r_packages.csv` is a stale partial snapshot, not a manifest.
+`R/_packages.R` is not sourced at runtime and feeds no lockfile — it is a human-readable inventory recording which packages each stage needs and why the two GitHub pins exist. Add new dependencies there for the next reader, and install them with plain `install.packages()`. `r_packages.csv` is a stale partial snapshot, not a manifest.
 
 There is no test suite and no linter configured. Verification is done by running scripts end to end and by browser-checking the app (Playwright / chrome-devtools MCP against `http://127.0.0.1:3838`).
 
@@ -70,8 +67,8 @@ These are analysis decisions, not preferences; breaking one silently invalidates
 
 ## Data and dependency constraints
 
-- `worldfootballR` is archived (Sep 2025) and stale on CRAN — pinned to GitHub commit `72af453f9eea` in `renv.lock`. Never install it from CRAN. `kickR` is deliberately deferred (pulls in RSelenium).
-- **`renv.lock` is Phase-1-only and incomplete**: 69 packages, none of them `shiny`, `bslib`, `data.table`, `htmltools`, `plotly`, `DT` or `FactoMineR`. `renv::restore()` today builds a container that cannot start the app, and the FactoMineR pin the containerization spec promises doesn't exist. Repair is tracked as **Wave 7.0** in `.opencode/plans/phase2-plan.md`. Local dev is unaffected — it never uses renv.
+- `worldfootballR` is archived (Sep 2025) and stale on CRAN — installed from GitHub commit `72af453f9eea` (`remotes::install_github("JaseZiv/worldfootballR", ref = "72af453f")`). Never install it from CRAN. `kickR` is deliberately deferred (pulls in RSelenium).
+- **No renv, and do not re-add it** — removed 2026-08-09 along with `renv.lock`, `renv/` and `.Rprofile`. The spec mandates it (`3. Containerization.txt:57`, marked "Non-Negotiable"), so this is a deliberate divergence; the full rationale is in `AGENTS.md` under *On renv*. Short version: the container needs six packages and never runs FAMD, so shipping the precomputed `.rds` already delivers what the lockfile was supposed to guarantee. Wave 7's Dockerfile pins via a dated Posit PPM snapshot instead.
 - Do not scrape Fotmob (TOS). FBref tables are sometimes wrapped in HTML comments, so default rvest selectors miss them.
 - FBref goal-log tables repeat their header every ~56 rows and contain empty spacer rows — filter on the `Date` column, never on `Rk`. Match-log pages have a two-row header; row 2 has the real names. Opponent names carry 2–3 letter country prefixes (`it Milan`, `sct Celtic`) — strip with `^[a-z]{2,3} `.
 - `data/raw/` and `data/external/` are gitignored (large, reproducible); `data/processed/` is tracked except the 33MB `club_elo_lookup.csv`.

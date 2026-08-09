@@ -35,7 +35,7 @@
 #   data/external/club_elo/{slug}.csv         -- raw ClubElo histories (cached)
 #   data/processed/club_elo_lookup.csv        -- long form: club, date_from, date_to, elo
 #
-# Run: Rscript --no-init-file --no-restore --no-save scripts/04_collect_elo_ratings.R
+# Run: Rscript scripts/04_collect_elo_ratings.R
 # ---------------------------------------------------------------------------
 
 source(here::here("R", "politeness.R"))

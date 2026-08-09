@@ -19,8 +19,8 @@
 #     Weighted_Goal (negative scores preserved — plain x^K would produce NaN).
 #   * Bootstrap data is match-level (each row = one appearance).
 #
-# Run on Windows WITHOUT renv (user library only):
-#   Rscript --no-init-file --no-restore --no-save scripts/08_prepare_analysis.R
+# Run:
+#   Rscript scripts/08_prepare_analysis.R
 
 suppressPackageStartupMessages({
   library(data.table)
@@ -184,6 +184,13 @@ famd_info <- list(
 meta <- list(
   built_at = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
   r_version = R.version.string,
+  # Reproducibility record. FactoMineR's version determines the Dim-1 loadings
+  # and therefore every weighted score downstream, so stamp what actually
+  # produced this bundle. (This replaces the renv lockfile, removed 2026-08-09:
+  # recording what was used cannot drift out of date the way a pin can.)
+  pkg_versions = vapply(c("FactoMineR", "data.table", "dplyr"),
+                        function(p) as.character(packageVersion(p)),
+                        character(1)),
   totals = list(
     goals_messi = nrow(goals[Player == "Messi"]),
     goals_ronaldo = nrow(goals[Player == "Ronaldo"]),
@@ -224,6 +231,8 @@ file.copy(OUT, APP_OUT, overwrite = TRUE)
 ## 9. Report
 ## ---------------------------------------------------------------------------
 cat("\nanalysis_bundle.rds written:\n")
+cat("  built with:", meta$r_version, "|",
+    paste(names(meta$pkg_versions), meta$pkg_versions, collapse = ", "), "\n")
 cat("  goals:", nrow(bundle$goals), " (Messi", meta$totals$goals_messi,
     "/ Ronaldo", meta$totals$goals_ronaldo, ")\n")
 cat("  matches:", meta$totals$matches_total, "valid:", meta$totals$matches_valid,

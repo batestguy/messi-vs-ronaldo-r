@@ -11,7 +11,7 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 
 1. **Layout-first, not blog-first.** The dashboard is built now; blog conversion is a much later phase. Every tab is a module so content can be reused later.
 2. **Weighted metrics are the front.** Default metric = Weighted Goals per 90. Raw goals are only the "Reality Check" comparison.
-3. **shinyapps.io** is the deploy target via `rsconnect`. Dockerfile still produced for reproducibility (Wave 7). Note `rsconnect` builds its **own** manifest by scanning app source against the installed libraries — it does **not** read `renv.lock`. That is why the lockfile gap (see Wave 7.0) blocks Wave 7 but not Wave 8.
+3. **shinyapps.io** is the deploy target via `rsconnect`. Dockerfile still produced for reproducibility (Wave 7). Note `rsconnect` builds its **own** manifest by scanning app source against the installed libraries — it needs no lockfile at all. Wave 7 pins via a dated Posit PPM snapshot instead (renv removed 2026-08-09).
 4. **Wave-by-wave review**: after each wave, stop and summarize; proceed only after approval.
 5. **Photos**: CC-licensed Wikimedia Commons images (`app/www/img/`) with graceful fallback; `app/www/ATTRIBUTIONS.md` documents sources.
 
@@ -73,42 +73,28 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 ### Wave 6 — Polish
 - Loader UX (waiter), `bindCache()` per plot, mobile responsive layout, final visual pass.
 
-### Wave 7.0 — Repair `renv.lock` (BLOCKS Wave 7)
+### ~~Wave 7.0 — Repair `renv.lock`~~ — RESOLVED 2026-08-09 by removing renv
 
-**Problem.** `renv.lock` holds 69 packages and contains **none** of `shiny`, `bslib`, `data.table`, `htmltools`, `plotly`, `DT`, or `FactoMineR`. It is a Phase-1-only lockfile, snapshotted before the dashboard existed. So:
-
-- `3. Containerization.txt:64` has the Docker build run `renv::restore()` — today that yields a container with **no shiny in it**, which cannot start the app.
-- `3. Containerization.txt:68` justifies renv specifically as *"A minor FactoMineR update could change your loadings and therefore your weighted scores. renv freezes the statistical methodology."* **FactoMineR is not in the lock**, so that guarantee is not currently delivered.
-
-**Repair.** Snapshot *from* the user library — this avoids copying 163 MB into the pathologically slow renv library on this machine:
-
-```r
-renv::snapshot(
-  library = "C:/Users/TOSHIBA/AppData/Local/R/win-library/4.5",
-  type    = "implicit"   # scans app/*.R + scripts/*.R for library() calls
-)
-```
-
-The canonical alternative is `renv::hydrate()` then `renv::snapshot()` — correct, but slow here. Note that plain `renv::snapshot()` **alone does nothing useful**: under an active renv `.libPaths()` is the project library, where shiny isn't installed, so it finds nothing to record.
-
-**Acceptance checks:**
-
-- [ ] `renv.lock` gains `shiny`, `bslib`, `htmltools`, `data.table`, `plotly`, `DT`, `FactoMineR`.
-- [ ] **`worldfootballR` still resolves to GitHub `RemoteSha: 72af453f9eea` and has NOT been rewritten to a CRAN entry.** This is the main risk of re-snapshotting — the package is archived and the pin is load-bearing.
-- [ ] `FactoMineR` added to `R/_packages.R` so the FAMD pin the spec promises has a declared source.
-- [ ] Working tree committed first (`renv.lock` is tracked); review the lockfile diff, don't assume it.
-- [ ] Day-to-day workflow unchanged afterwards — still `Rscript --no-init-file --no-restore --no-save`.
+Superseded. The lockfile was not repaired; **renv was removed from the project entirely**
+(`renv.lock`, `renv/`, `.Rprofile` deleted). Rationale in `AGENTS.md` under *On renv* —
+the container needs six packages and never runs FAMD, so the precomputed `.rds` already
+delivers what the lockfile was meant to guarantee. Wave 7 is no longer blocked.
 
 ### Wave 7 — Docker
 - `Dockerfile` (rocker/shiny-verse:4.5.0 pinned, multi-stage, non-root, HEALTHCHECK, port 3838) + `.dockerignore`; include only bundle + app; no worldfootballR/FactoMineR at runtime.
-- **Prerequisite: Wave 7.0 above must be done first**, or `renv::restore()` builds an app-less image.
+- **Package install pins by dated Posit PPM snapshot, not renv.** Frozen date = reproducible, and PPM serves precompiled Linux binaries so the layer builds fast:
+  ```dockerfile
+  RUN R -e 'options(repos = "https://packagemanager.posit.co/cran/2026-08-09"); \
+            install.packages(c("shiny","bslib","data.table","htmltools","plotly","DT"))'
+  ```
+- Those six are the entire runtime. Verify by building and hitting `http://localhost:3838` — do not assume the list; if a module gains a dependency in Waves 2–6, add it here and to `R/_packages.R`.
 
 ### Wave 8 — Deploy
 - `scripts/09_deploy_shinyapps.R` (rsconnect), deploy, verify live URL.
 
 ## Gotchas (carrying from Phase 1)
 
-- Windows: run scripts with `Rscript --no-init-file --no-restore --no-save` (user library, NOT renv — renv loads wfR >5 min).
+- Run scripts with plain `Rscript <script>` — no flags. There is no `.Rprofile` and no renv (removed 2026-08-09); everything resolves from the user library.
 - Use `data.table::fread` for big CSV (26 s vs >2 min `readr`).
 - 3 goals lack match context (2026 WC knockout window) — NA Difficulty; keep NA, do not drop.
 - DNP rows (Minutes == 0/NA) dropped from per-90 denominator, but zero-goal appearances MUST stay.

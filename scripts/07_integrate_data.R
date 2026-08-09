@@ -28,7 +28,7 @@
 #   data/processed/quality_report.txt     -- coverage vs spec §6.1
 #   data/data_dictionary.md               -- column definitions
 #
-# Run: Rscript --no-init-file --no-restore --no-save scripts/07_integrate_data.R
+# Run: Rscript scripts/07_integrate_data.R
 # ---------------------------------------------------------------------------
 
 source(here::here("R", "politeness.R"))

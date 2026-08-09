@@ -8,7 +8,7 @@ Status: **Wave 1 complete; stop for user review**
 - Wave 0 committed as `92271d9`.
 - Wave 1 Overview implemented in `app/R/mod_overview.R`.
 - Dashboard launcher/static asset fix implemented:
-  - Start with `Rscript --no-init-file --no-restore --no-save app/run.R` from the repository root.
+  - Start with `Rscript app/run.R` from the repository root (no flags — renv removed 2026-08-09).
   - Do not launch with `app/app.R` directly; Shiny then cannot reliably serve `app/www/`.
 - Navbar stylesheet moved into the `header` slot so it does not create an empty navigation item.
 - Navbar colors explicitly set in `app/R/theme.R`.
@@ -54,10 +54,15 @@ After user approval, begin **Wave 2 — Weighting**:
 2. Reality Check comparison of raw vs weighted per-90 rates.
 3. Difficulty distribution and goal-count-by-difficulty view.
 
-## Open finding — `renv.lock` is incomplete (2026-08-09)
+## Resolved — renv removed (2026-08-09)
 
-`renv.lock` is a Phase-1-only lockfile: 69 packages, none of them `shiny`, `bslib`, `data.table`, `htmltools`, `plotly`, `DT` or `FactoMineR`. Consequences: a Docker `renv::restore()` builds an image that cannot start the app, and the FactoMineR freeze that `3. Containerization.txt:68` cites as renv's whole purpose isn't in place.
+The Phase-1-only lockfile (69 packages, no `shiny`, no `FactoMineR`) was not repaired —
+**renv was removed from the project.** `renv.lock`, `renv/` and `.Rprofile` are gone, so
+every command is now plain `Rscript <script>` with no flags. Wave 7 pins its Docker layer
+with a dated Posit PPM snapshot instead; Wave 7 is no longer blocked.
 
-Not urgent — local dev never touches renv and shinyapps.io/`rsconnect` builds its own manifest. Tracked as **Wave 7.0** in `phase2-plan.md`; must be done before Wave 7.
+Full rationale in `AGENTS.md` under *On renv* — this diverges from
+`3. Containerization.txt:57`, which marks renv "Non-Negotiable", so read that note before
+reinstating anything. **Do not re-add renv.**
 
 Keep the app running for review. Restart after code changes with `app/run.R`, then refresh the browser.

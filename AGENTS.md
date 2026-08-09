@@ -9,17 +9,16 @@ contradicts it, this file wins — surface the conflict, do not silently pick on
 (The four root `.txt` files remain the authoritative *spec*; where the build has
 deliberately diverged from them, it is annotated below rather than overwritten.)
 
-1. **Run everything with `--no-init-file`, NOT renv:**
-   `Rscript --no-init-file --no-restore --no-save <script>`. The renv library on
-   this machine loads packages pathologically slowly. See *Stack & environment*.
-2. **Launch the app only via `app/run.R`**, never `Rscript app/app.R` — the latter
+1. **There is no renv in this project. Do not add it.** Removed 2026-08-09; the
+   spec still mandates it, and that divergence is deliberate — see *On renv* under
+   *Stack & environment* before you act on `3. Containerization.txt`.
+2. **Every command is plain `Rscript <script>`** — no `--no-init-file`, no flags.
+   There is no `.Rprofile`. Packages come from the user library.
+3. **Launch the app only via `app/run.R`**, never `Rscript app/app.R` — the latter
    404s every static asset in `app/www/`.
-3. **The K-slider is a SIGNED power: `sign(x) * abs(x)^K`.** Plain `x^K` returns
+4. **The K-slider is a SIGNED power: `sign(x) * abs(x)^K`.** Plain `x^K` returns
    `NaN` on the negative difficulty scores.
-4. **Stop after each wave and summarize.** Do not chain waves; the user reviews each one.
-5. **`renv.lock` is Phase-1-only and INCOMPLETE** — it has no shiny and no
-   FactoMineR. Do not trust it for Docker or deploy until the Wave 7.0 repair task
-   in `.opencode/plans/phase2-plan.md` is done.
+5. **Stop after each wave and summarize.** Do not chain waves; the user reviews each one.
 
 ## What this repo is
 
@@ -30,29 +29,44 @@ deliberately diverged from them, it is annotated below rather than overwritten.)
 ## Stack & environment
 
 - **R 4.5.2** (`rocker/shiny-verse:4.5.0` pinned for Docker). `r_packages.csv` is only a partial reference snapshot, never a manifest.
-- **`renv.lock` is a Phase-1-only lockfile and is currently INCOMPLETE.** It holds 69 packages and contains **none** of `shiny`, `bslib`, `data.table`, `htmltools`, `plotly`, `DT`, or `FactoMineR` — it was snapshotted before the dashboard existed. Two consequences: (a) a Docker build running `renv::restore()` today produces a container that cannot start the app; (b) `3. Containerization.txt:68` justifies renv as the thing that freezes FactoMineR so FAMD loadings can't drift, and FactoMineR is not in the lock, so that guarantee is not currently delivered. **Repair is tracked as Wave 7.0** in `.opencode/plans/phase2-plan.md` — do it before Wave 7, not during.
-- `worldfootballR` is **unmaintained/archived (Sep 2025); CRAN version stale** — pinned to GitHub commit `72af453f9eea` in `renv.lock`. Never install from CRAN. `kickR` (GitHub `ed583cdb047d`) is **deferred** — it imports RSelenium (heavy); re-enable only if `fb_*` fails (see `R/_packages.R`).
-- **Runtime env gotcha (Win, this machine):** the renv library path (`renv/library/windows/...`) loads packages extremely slowly or hangs (`library(worldfootballR)` from there hung >5 min). The **default user library** `C:/Users/TOSHIBA/AppData/Local/R/win-library/4.5` is fast and already has rvest/dplyr/readr/httr/chromote — use `Rscript --no-init-file --no-restore --no-save` (no renv) for scripts that don't need `worldfootballR`. `worldfootballR` exists only in the renv library (see `.opencode/plans/phase2-plan.md` + handoff notes for Phase 1 gotchas).
+- **One library, no environment manager.** Everything lives in the user library `C:/Users/TOSHIBA/AppData/Local/R/win-library/4.5`. There is no `.Rprofile`, so plain `Rscript <script>` is correct everywhere. `R/_packages.R` is a human-readable inventory of what each part needs — it is not sourced at runtime and feeds no lockfile.
+- `worldfootballR` is **unmaintained/archived (Sep 2025); CRAN version stale** — pinned to GitHub commit `72af453f9eea` (installed in the user library at that SHA). **Never install from CRAN.** Reinstall with `remotes::install_github("JaseZiv/worldfootballR", ref = "72af453f")`. `kickR` (GitHub `ed583cdb047d`) is **deferred** — it imports RSelenium (heavy); re-enable only if `fb_*` fails (see `R/_packages.R`).
 - `chromote` is a **runtime dependency** — FBref is behind a Cloudflare managed challenge that plain `httr`/`rvest` cannot pass.
-- Use **`renv`** for locking in the **Dockerfile only**; never `install.packages()` unversioned there. renv is **not** used for local development (see the runtime gotcha above) and is **not** the shinyapps.io mechanism — `rsconnect` builds its own manifest by scanning app source against the installed libraries, so Wave 8 does not read `renv.lock`.
+- **Deployment does not need a lockfile either.** `rsconnect` builds its own manifest by scanning app source against the installed libraries, so Wave 8 (shinyapps.io) never reads one. Wave 7's Dockerfile pins by **dated Posit PPM snapshot** instead — see *Docker / deployment*.
 - Avoid `shinydashboard` (heavy JS) and `rJava`/text-analysis libs. **On `shiny.fluent`:** the spec recommends it (`2. DataAnalysis.txt:176`, `3. Containerization.txt:353`), but the build is **bslib-only** — `shiny.fluent` is not installed and not used anywhere in `app/`. Deliberate divergence; **do not add it.**
 
-### Where renv actually lives
+### On renv — deliberate divergence from the spec (2026-08-09)
 
-| Piece | Path | Size |
-|---|---|---|
-| Project library | `D:\MessivsRonaldoR\renv\library\windows\R-4.5\x86_64-w64-mingw32` | 163.4 MB, 79 pkgs — gitignored, real directories (not junctions) |
-| Global cache | `C:\Users\TOSHIBA\AppData\Local\R\cache\R\renv` | 44.2 MB — on C:, outside the repo |
-| Lockfile | `D:\MessivsRonaldoR\renv.lock` | tracked in git |
+**The spec mandates renv and this build does not use it.** `3. Containerization.txt:57`
+heads its section *"Dependency Management with renv (Non-Negotiable)"*, and the vision doc
+names renv four times as the reproducibility story. renv was nonetheless **removed** —
+`renv.lock`, `renv/`, and `.Rprofile` are all deleted. Do not re-add it. The reasoning,
+so it isn't relitigated:
 
-`worldfootballR` exists in **both** the renv library and the user library (installed there from the pinned commit — see `.opencode/plans/wave-a-handoff.md` §5), so the scrapers run fine with `--no-init-file` too.
+- **The container never runs FAMD.** `3. Containerization.txt:68` justifies renv as the
+  thing that "freezes the statistical methodology" so a FactoMineR update can't shift the
+  loadings. But the same spec requires FAMD to be precomputed locally and shipped as
+  `.rds`; the image only multiplies numbers. **Shipping the artifact is a stronger
+  guarantee than pinning the library that produced it** — and `scripts/08` now stamps
+  `bundle$meta$pkg_versions` with the FactoMineR version that actually built it.
+- **The image needs six packages** — `shiny`, `bslib`, `data.table`, `htmltools`,
+  `plotly`, `DT`. A 69-package lockfile and a 172.6 MB project library served none of them.
+- **The lockfile was written at project start**, before the dashboard existed, so it
+  contained no `shiny` and no `FactoMineR` — `renv::restore()` would have built a
+  container that could not boot. That is the general failure: **lock the environment once
+  the app is built and the dependency set is known, never at project start.** A lockfile
+  is a record of what you ended up depending on; written early it looks correct while
+  being wrong, and the gap surfaces far from its cause.
+
+Deleting `.Rprofile` (whose only line was `source("renv/activate.R")`) is what removes
+`--no-init-file` from every command in this project.
 
 ### Launching the dashboard
 
-**Always `app/run.R`, never `Rscript app/app.R`.** `run.R` calls `shiny::runApp(appDir = ...)` so Shiny serves `app/www/` as static assets; launched via `app.R` the stylesheet and player images 404. It also guards the three ways this launch fails (renv on the library path, wrong working directory, port 3838 already held by an earlier instance).
+**Always `app/run.R`, never `Rscript app/app.R`.** `run.R` calls `shiny::runApp(appDir = ...)` so Shiny serves `app/www/` as static assets; launched via `app.R` the stylesheet and player images 404. It also guards the three ways this launch fails (Shiny stack not installed, wrong working directory, port 3838 already held by an earlier instance).
 
 ```powershell
-Rscript --no-init-file --no-restore --no-save app/run.R   # http://127.0.0.1:3838
+Rscript app/run.R   # http://127.0.0.1:3838
 ```
 
 Restart the process after code changes, then refresh the browser.
@@ -93,7 +107,13 @@ Restart the process after code changes, then refresh the browser.
 
 - Base image `rocker/shiny-verse:4.5.0` **pinned — never `latest`**. Multi-stage; target < 1.5 GB; runs as the non-root `shiny` user (don't override). Shiny port **3838**.
 - **FAMD must be pre-computed locally** and saved as `data/famd_loadings.rds`; the container only loads the `.rds` and multiplies — never run FAMD at startup (~2s vs ~15s, memory-safe).
-- **Layer order for cache efficiency:** base → system deps → R packages (`renv::restore()`) → app code → CMD.
+- **Layer order for cache efficiency:** base → system deps → R packages → app code → CMD.
+- **Package pinning is a dated Posit PPM snapshot, not renv** (see *On renv* above). The frozen date makes the install reproducible, and PPM serves precompiled Linux binaries so the layer builds far faster than a source `renv::restore()`:
+  ```dockerfile
+  RUN R -e 'options(repos = "https://packagemanager.posit.co/cran/2026-08-09"); \
+            install.packages(c("shiny","bslib","data.table","htmltools","plotly","DT"))'
+  ```
+  Those six are the whole runtime — no `worldfootballR`, no `FactoMineR`. Never call `install.packages()` there without the pinned `repos`.
 - System libs the base lacks (ggplot2/plotly/HTTPS): `libssl-dev`, `libcurl4-openssl-dev`, `libxml2-dev`, `libfreetype6-dev`, `libharfbuzz-dev`, `libpng-dev`, `libjpeg-dev`.
 - `HEALTHCHECK` curls `http://localhost:3838/`. Logs to **stdout** (JSON), not files. Data is <1 MB — embed in the image, no volume mounts.
 

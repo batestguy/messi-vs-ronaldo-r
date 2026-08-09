@@ -25,8 +25,7 @@
 #   data/raw/transfermarkt_transfers.rds -- transfer history rows
 #   data/processed/transfermarkt_summary.csv -- merged, tidy (for 07/dashboard)
 #
-# Run: Rscript --no-init-file --no-restore --no-save scripts/05_scrape_transfermarkt.R
-#      (uses the FAST user library; renv.lock is the manifest of record for Docker)
+# Run: Rscript scripts/05_scrape_transfermarkt.R
 # ---------------------------------------------------------------------------
 
 source(here::here("R", "politeness.R"))
