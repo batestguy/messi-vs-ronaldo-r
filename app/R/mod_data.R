@@ -5,7 +5,7 @@
 mod_data_ui <- function(id) {
   ns <- NS(id)
   card(
-    card_header = "Raw data",
+    card_header("Raw data"),
     card(
       class = "text-muted p-3",
       "Wave 5 pending — interactive table of all 1,738 goals with search/filter."

@@ -37,7 +37,10 @@ bundle <- readRDS(bundle_path)
 # UI
 # ---------------------------------------------------------------------------
 ui <- page_navbar(
-  title = tags$span(tags$i(class = "bi bi-trophy-fill", style = "margin-right:8px;"),
+  # Unicode glyph, not a Bootstrap Icons class: bsicons isn't installed and the
+  # bi-* CSS is never loaded, so <i class="bi bi-trophy-fill"> rendered 0px wide.
+  # A CDN link would fix it but breaks the offline container build.
+  title = tags$span(tags$span("\U0001F3C6", style = "margin-right:8px;"),
                     "Messi vs Ronaldo — The Weighted Case"),
   theme = app_theme(),
   id = "main_tabs",

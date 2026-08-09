@@ -5,7 +5,7 @@
 mod_methodology_ui <- function(id) {
   ns <- NS(id)
   card(
-    card_header = "Methodology",
+    card_header("Methodology"),
     card(
       class = "text-muted p-3",
       "Wave 5 pending — data collection, FAMD construction, weighting, bootstrap,

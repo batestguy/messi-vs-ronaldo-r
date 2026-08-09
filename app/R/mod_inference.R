@@ -5,7 +5,7 @@
 mod_inference_ui <- function(id) {
   ns <- NS(id)
   card(
-    card_header = "Inference / Uncertainty",
+    card_header("Inference / Uncertainty"),
     card(
       class = "text-muted p-3",
       "Wave 4 pending — match-level bootstrap (10k resamples) of the weighted

@@ -5,7 +5,7 @@
 mod_head2head_ui <- function(id) {
   ns <- NS(id)
   card(
-    card_header = "Head-to-Head",
+    card_header("Head-to-Head"),
     card(
       class = "text-muted p-3",
       "Wave 3 pending — cumulative weighted trajectories, opponent-Elo scatter,

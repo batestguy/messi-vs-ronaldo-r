@@ -5,7 +5,7 @@
 mod_weighting_ui <- function(id) {
   ns <- NS(id)
   card(
-    card_header = "Weighting / Difficulty",
+    card_header("Weighting / Difficulty"),
     card(
       class = "text-muted p-3",
       "Wave 2 pending — K-slider sensitivity, difficulty density, Reality Check bars."
