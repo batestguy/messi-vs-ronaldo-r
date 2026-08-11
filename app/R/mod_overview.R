@@ -1,23 +1,129 @@
 # app/R/mod_overview.R
-# Wave 1: Overview tab — headline KPI cards + intro text + player photos.
+# Wave 1: Overview tab — headline KPI cards + player identity and club journey.
+
+# Static presentation metadata. Goal counts are deliberately not stored here:
+# they are calculated from bundle$goals so the rail always describes the
+# dashboard snapshot rather than an external/live career total.
+CLUB_ERAS <- data.table::data.table(
+  Player = c(rep("Messi", 3), rep("Ronaldo", 5)),
+  Squad_clean = c(
+    "Barcelona", "PSG", "Inter Miami",
+    "Sporting CP", "Manchester Utd", "Real Madrid", "Juventus", "Al-Nassr"
+  ),
+  Club = c(
+    "Barcelona", "Paris Saint-Germain", "Inter Miami",
+    "Sporting CP", "Manchester United", "Real Madrid", "Juventus", "Al-Nassr"
+  ),
+  Years = c(
+    "2004–2021", "2021–2023", "2023–present",
+    "2002–2003", "2003–2009 · 2021–2022", "2009–2018", "2018–2021", "2023–present"
+  ),
+  Asset = c(
+    "img/clubs/barcelona.svg", "img/clubs/psg.svg", "img/clubs/inter-miami.svg",
+    "img/clubs/sporting-cp.svg", "img/clubs/manchester-united.svg",
+    "img/clubs/real-madrid.svg", "img/clubs/juventus.svg", "img/clubs/al-nassr.svg"
+  ),
+  Current = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE),
+  Order = c(1L, 2L, 3L, 1L, 2L, 3L, 4L, 5L)
+)
+
+club_journey_ui <- function(clubs, player) {
+  player_key <- tolower(player)
+
+  div(
+    class = "club-journey",
+    div(
+      class = "club-journey__header",
+      tags$h3("Senior club journey"),
+      span("dataset snapshot", class = "snapshot-badge")
+    ),
+    div(
+      class = sprintf("club-rail club-rail--%d club-rail--%s", nrow(clubs), player_key),
+      role = "list",
+      `aria-label` = sprintf("%s senior club journey", player),
+      lapply(seq_len(nrow(clubs)), function(i) {
+        club <- clubs[i]
+        tags$article(
+          class = paste(
+            "club-stop",
+            if (isTRUE(club$Current)) "club-stop--current" else NULL
+          ),
+          role = "listitem",
+          div(
+            class = "club-stop__marker",
+            div(
+              class = "club-stop__crest",
+              tags$img(
+                src = club$Asset,
+                alt = sprintf("%s crest", club$Club),
+                width = 50,
+                height = 50,
+                loading = "lazy"
+              )
+            )
+          ),
+          div(class = "club-stop__name", club$Club),
+          div(class = "club-stop__years", club$Years),
+          div(
+            class = "club-stop__goals",
+            tags$strong(format(club$Goals, big.mark = ",", scientific = FALSE)),
+            " goals in this dataset"
+          ),
+          if (isTRUE(club$Current)) {
+            span("Current chapter", class = "current-chapter")
+          }
+        )
+      })
+    )
+  )
+}
 
 mod_overview_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
-    # --- Player photos row ------------------------------------------------
+    # --- Country + club journey profiles ---------------------------------
     fluidRow(
-      column(6, class = "text-center",
-        tags$img(src = "img/messi.jpg", height = "170px",
-                 style = "border-radius:50%; object-fit:cover; width:170px; border:3px solid #14447D;"),
-        h3("Lionel Messi", style = "color:#14447D; margin-top:10px;"),
-        tags$small("Argentina  |  2004–2026")
+      class = "profile-grid",
+      column(6,
+        tags$section(
+          class = "player-profile player-profile--messi",
+          `aria-labelledby` = ns("messi_profile_name"),
+          div(
+            class = "player-identity",
+            tags$img(
+              src = "img/messi.jpg",
+              alt = "Lionel Messi representing Argentina",
+              width = 176,
+              height = 176,
+              class = "player-portrait player-portrait--messi"
+            ),
+            h2("Lionel Messi", id = ns("messi_profile_name"), class = "player-name"),
+            p("Argentina national team", class = "player-country"),
+            p("Dashboard coverage: 2004–2026", class = "player-coverage")
+          ),
+          uiOutput(ns("messi_clubs"))
+        )
       ),
-      column(6, class = "text-center",
-        tags$img(src = "img/ronaldo.jpg", height = "170px",
-                 style = "border-radius:50%; object-fit:cover; width:170px; border:3px solid #A61E2C;"),
-        h3("Cristiano Ronaldo", style = "color:#A61E2C; margin-top:10px;"),
-        tags$small("Portugal  |  2002–2026")
+      column(6,
+        tags$section(
+          class = "player-profile player-profile--ronaldo",
+          `aria-labelledby` = ns("ronaldo_profile_name"),
+          div(
+            class = "player-identity",
+            tags$img(
+              src = "img/ronaldo.jpg",
+              alt = "Cristiano Ronaldo representing Portugal",
+              width = 176,
+              height = 176,
+              class = "player-portrait player-portrait--ronaldo"
+            ),
+            h2("Cristiano Ronaldo", id = ns("ronaldo_profile_name"), class = "player-name"),
+            p("Portugal national team", class = "player-country"),
+            p("Dashboard coverage: 2002–2026", class = "player-coverage")
+          ),
+          uiOutput(ns("ronaldo_clubs"))
+        )
       )
     ),
 
@@ -65,6 +171,29 @@ mod_overview_ui <- function(id) {
 # ---------------------------------------------------------------------------
 mod_overview_server <- function(id, state) {
   moduleServer(id, function(input, output, session) {
+
+    club_eras <- reactive({
+      eras <- data.table::copy(CLUB_ERAS)
+      club_counts <- state$bundle$goals[, .(Goals = .N), by = .(Player, Squad_clean)]
+      eras <- merge(
+        eras,
+        club_counts,
+        by = c("Player", "Squad_clean"),
+        all.x = TRUE,
+        sort = FALSE
+      )
+      eras[is.na(Goals), Goals := 0L]
+      data.table::setorder(eras, Player, Order)
+      eras
+    })
+
+    output$messi_clubs <- renderUI({
+      club_journey_ui(club_eras()[Player == "Messi"], "Messi")
+    })
+
+    output$ronaldo_clubs <- renderUI({
+      club_journey_ui(club_eras()[Player == "Ronaldo"], "Ronaldo")
+    })
 
     output$kpi_cards <- renderUI({
 

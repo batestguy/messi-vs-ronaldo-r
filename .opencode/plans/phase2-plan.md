@@ -1,6 +1,6 @@
 # Phase 2 — Interactive Dashboard (Messi vs Ronaldo)
 
-Status: **Wave 1 complete; awaiting review for Wave 2** (user-approved wave-by-wave review model).
+Status: **Wave 1 revision complete; paused before Wave 2** (user-approved wave-by-wave review model).
 Phase 1 complete: `a3c0a7f` (pipeline) + `016ff08` (docs). Working tree clean at start of Phase 2.
 
 ## Deliverable
@@ -48,8 +48,15 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 - **Photos**: download CC-licensed images (Wikimedia Commons) with fallback; ATTRIBUTIONS.md.
 - **Smoke check**: app boots locally (script exits after "Listening on..." + one HTTP GET).
 
-### Wave 1 — Overview (complete, commit `4450c03`)
-- 4 KPI cards (Weighted Goals per 90, Raw Goals, Minutes, Appearances — leader bolded), intro panels (motivation, existing approaches, what we built), photos. `mod_overview.R`.
+### Wave 1 — Overview (complete; baseline commit `4450c03`, revised 2026-08-11)
+- Four KPI cards (Weighted Goals per 90, Raw Goals, Total Goals, Appearances — leader bolded) and the two original intro panels.
+- Country profiles separate national-team identity from dashboard coverage and retain the circular player portraits.
+- Server-rendered senior club journeys use static era metadata but calculate snapshot goal counts from `bundle$goals`.
+- Eight local crest SVGs, meaningful alt text, current-chapter highlights, and full source/trademark documentation.
+- Offline-safe native MathML explains the signed-power formula in the global-controls sidebar; no MathJax/CDN.
+- Responsive desktop timeline and narrow-screen card layouts. The stylesheet URL is versioned to prevent browsers from combining revised markup with stale CSS.
+- No analytical calculations, bundle schemas, package dependencies, or public data files changed.
+- Full implementation and verification record: `.opencode/plans/phase2-handoff.md`.
 
 ### Wave 2 — Weighting (core methodology tab)
 - K-slider sensitivity stress-test vs Weighted per 90 (line over K, both players).

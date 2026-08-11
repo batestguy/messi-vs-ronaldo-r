@@ -1,4 +1,14 @@
-/* app/www/css.css — small visual refinements on top of Flatly */
+/* app/www/css.css — visual refinements on top of Flatly */
+:root {
+  --messi: #14447d;
+  --messi-soft: #eaf2fb;
+  --ronaldo: #a61e2c;
+  --ronaldo-soft: #fbecef;
+  --ink: #17202a;
+  --muted: #6b7a8d;
+  --line: #dce3ec;
+}
+
 .kpi-card { border: 0; }
 .kpi-head { border-bottom: 1px solid #edf0f5; }
 .kpi-title { letter-spacing: .05em; text-transform: uppercase; }
@@ -7,3 +17,375 @@
 .tab-content { padding-top: 1rem; }
 .sidebar { background: #f8fafc; }
 .lead-badge { font-size: .8rem; vertical-align: middle; }
+
+/* Sidebar formula -------------------------------------------------------- */
+.weight-formula {
+  margin: .35rem 0 1.15rem;
+  padding: .8rem .85rem;
+  overflow: hidden;
+  color: var(--ink);
+  background:
+    linear-gradient(135deg, rgba(20, 68, 125, .08), rgba(166, 30, 44, .05)),
+    #fff;
+  border: 1px solid rgba(20, 68, 125, .16);
+  border-radius: .85rem;
+  box-shadow: 0 8px 24px rgba(23, 32, 42, .05);
+}
+
+.weight-formula__title {
+  margin-bottom: .45rem;
+  color: var(--messi);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.weight-formula math {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  font-size: .89rem;
+}
+
+.weight-formula__equation {
+  margin: 0 auto .35rem;
+}
+
+.weight-formula__base {
+  margin: 0 auto .5rem;
+  color: #34495e;
+  font-size: .83rem;
+}
+
+.weight-formula__help {
+  margin: 0;
+  color: var(--muted);
+  font-size: .76rem;
+  line-height: 1.42;
+}
+
+/* Overview player identities -------------------------------------------- */
+.profile-grid {
+  align-items: stretch;
+  margin-bottom: .5rem;
+  row-gap: 1rem;
+}
+
+.player-profile {
+  --player-color: var(--ink);
+  --player-soft: #f4f6f8;
+  position: relative;
+  height: 100%;
+  padding: 1.45rem 1.25rem 1.25rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 0, var(--player-soft), transparent 42%),
+    #fff;
+  border: 1px solid rgba(23, 32, 42, .08);
+  border-radius: 1.25rem;
+  box-shadow: 0 14px 38px rgba(23, 32, 42, .07);
+}
+
+.player-profile::after {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  content: "";
+  background: var(--player-color);
+}
+
+.player-profile--messi {
+  --player-color: var(--messi);
+  --player-soft: var(--messi-soft);
+}
+
+.player-profile--ronaldo {
+  --player-color: var(--ronaldo);
+  --player-soft: var(--ronaldo-soft);
+}
+
+.player-identity {
+  text-align: center;
+}
+
+.player-portrait {
+  display: block;
+  width: 176px;
+  height: 176px;
+  margin: 0 auto;
+  object-fit: cover;
+  border: 4px solid var(--player-color);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 7px #fff,
+    0 12px 30px rgba(23, 32, 42, .18);
+}
+
+.player-name {
+  margin: 1rem 0 .2rem;
+  color: var(--player-color);
+  font-size: clamp(1.45rem, 2vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+
+.player-country {
+  margin: 0;
+  color: var(--ink);
+  font-size: .98rem;
+  font-weight: 700;
+}
+
+.player-coverage {
+  margin: .2rem 0 0;
+  color: var(--muted);
+  font-size: .78rem;
+  letter-spacing: .025em;
+}
+
+/* Senior club timeline --------------------------------------------------- */
+.club-journey {
+  margin-top: 1.35rem;
+}
+
+.club-journey__header {
+  display: flex;
+  gap: .7rem;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: .95rem;
+}
+
+.club-journey__header h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.snapshot-badge {
+  padding: .18rem .45rem;
+  color: var(--muted);
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  background: #f2f5f8;
+  border: 1px solid #e3e8ee;
+  border-radius: 999px;
+}
+
+.club-rail {
+  position: relative;
+  display: grid;
+  gap: .45rem;
+  align-items: start;
+}
+
+.club-rail--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.club-rail--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+.club-rail::before {
+  position: absolute;
+  top: 34px;
+  right: 9%;
+  left: 9%;
+  height: 2px;
+  content: "";
+  background: linear-gradient(90deg, transparent, var(--line) 8%, var(--line) 92%, transparent);
+}
+
+.club-stop {
+  position: relative;
+  min-width: 0;
+  padding: 0 .1rem .4rem;
+  text-align: center;
+}
+
+.club-stop__marker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  margin-bottom: .55rem;
+}
+
+.club-stop__crest {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  place-items: center;
+  padding: 9px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  box-shadow: 0 6px 16px rgba(23, 32, 42, .11);
+}
+
+.club-stop__crest img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.club-stop__name {
+  min-height: 2.25em;
+  color: var(--ink);
+  font-size: .74rem;
+  font-weight: 800;
+  line-height: 1.12;
+}
+
+.club-stop__years {
+  min-height: 2.35em;
+  margin-top: .25rem;
+  color: var(--muted);
+  font-size: .66rem;
+  line-height: 1.18;
+}
+
+.club-stop__goals {
+  margin-top: .32rem;
+  color: #536273;
+  font-size: .64rem;
+  line-height: 1.25;
+}
+
+.club-stop__goals strong {
+  color: var(--player-color);
+  font-size: .76rem;
+}
+
+.club-stop--current .club-stop__crest {
+  border: 2px solid var(--player-color);
+  box-shadow:
+    0 0 0 5px var(--player-soft),
+    0 7px 18px rgba(23, 32, 42, .14);
+}
+
+.club-stop--current .club-stop__name {
+  color: var(--player-color);
+}
+
+.current-chapter {
+  display: inline-block;
+  margin-top: .48rem;
+  padding: .18rem .4rem;
+  color: #fff;
+  font-size: .57rem;
+  font-weight: 800;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  background: var(--player-color);
+  border-radius: 999px;
+}
+
+@media (max-width: 1199.98px) {
+  .profile-grid > .col-sm-6 {
+    width: 100%;
+  }
+
+  .club-stop__name {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .navbar-header {
+    min-width: 0;
+  }
+
+  .navbar-brand {
+    display: block;
+    max-width: calc(100% - 64px);
+    overflow: hidden;
+    font-size: clamp(.75rem, 3.2vw, .9rem);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .navbar-toggle {
+    margin-right: 0;
+  }
+
+  .player-profile {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .player-portrait {
+    width: 158px;
+    height: 158px;
+  }
+
+  .club-journey__header {
+    justify-content: flex-start;
+  }
+
+  .club-rail,
+  .club-rail--3,
+  .club-rail--5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .7rem;
+  }
+
+  .club-rail::before {
+    display: none;
+  }
+
+  .club-stop {
+    padding: .8rem .6rem .75rem;
+    background: rgba(255, 255, 255, .84);
+    border: 1px solid var(--line);
+    border-radius: .9rem;
+  }
+
+  .club-stop--current {
+    background: var(--player-soft);
+    border-color: var(--player-color);
+  }
+
+  .club-stop__years,
+  .club-stop__name {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 339.98px) {
+  .club-rail,
+  .club-rail--3,
+  .club-rail--5 {
+    grid-template-columns: 1fr;
+  }
+
+  .club-stop {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    column-gap: .75rem;
+    text-align: left;
+  }
+
+  .club-stop__marker {
+    grid-row: 1 / span 4;
+    margin: 0;
+  }
+
+  .club-stop__crest {
+    width: 58px;
+    height: 58px;
+  }
+
+  .club-stop__name,
+  .club-stop__years,
+  .club-stop__goals {
+    grid-column: 2;
+  }
+
+  .current-chapter {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

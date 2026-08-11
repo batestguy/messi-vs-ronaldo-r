@@ -33,6 +33,47 @@ if (!file.exists(bundle_path))
   stop("Missing app/data/analysis_bundle.rds — run scripts/08_prepare_analysis.R first.")
 bundle <- readRDS(bundle_path)
 
+# Offline-safe native MathML. Shiny's withMathJax() loads MathJax from a CDN,
+# which would break the app's offline/container-safe presentation. htmltools'
+# tag catalogue does not include MathML constructors, so this trusted static
+# markup is inserted directly rather than interpreted as text.
+weight_formula_panel <- function() {
+  div(
+    class = "weight-formula",
+    role = "note",
+    `aria-label` = paste(
+      "Weighted goal at K equals sign of Difficulty Score times the absolute",
+      "value of Difficulty Score raised to K. At K equals one, weighted goal",
+      "equals Difficulty Score."
+    ),
+    div("Signed-power weighting", class = "weight-formula__title"),
+    HTML(paste0(
+      '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" ',
+      'class="weight-formula__equation">',
+      '<mtable columnalign="left" rowspacing="0.18em"><mtr><mtd><mrow>',
+      '<msub><mi>WG</mi><mi>k</mi></msub><mo>=</mo>',
+      '<mi mathvariant="normal">sign</mi><mo>(</mo>',
+      '<msub><mi>Difficulty</mi><mi>Score</mi></msub><mo>)</mo>',
+      '</mrow></mtd></mtr><mtr><mtd><mrow><mspace width="1.35em"/>',
+      '<mo>×</mo>',
+      '<msup><mrow><mo>|</mo><msub><mi>Difficulty</mi><mi>Score</mi></msub>',
+      '<mo>|</mo></mrow><mi>K</mi></msup>',
+      '</mrow></mtd></mtr></mtable></math>'
+    )),
+    HTML(paste0(
+      '<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" ',
+      'class="weight-formula__base">',
+      '<mrow><mi>K</mi><mo>=</mo><mn>1</mn><mo>⇒</mo>',
+      '<msub><mi>WG</mi><mn>1</mn></msub><mo>=</mo>',
+      '<msub><mi>Difficulty</mi><mi>Score</mi></msub></mrow></math>'
+    )),
+    p(
+      "K changes sensitivity to the stored difficulty score; K = 1 preserves the base index.",
+      class = "weight-formula__help"
+    )
+  )
+}
+
 # ---------------------------------------------------------------------------
 # UI
 # ---------------------------------------------------------------------------
@@ -44,7 +85,12 @@ ui <- page_navbar(
                     "Messi vs Ronaldo — The Weighted Case"),
   theme = app_theme(),
   id = "main_tabs",
-  header = tags$head(tags$link(rel = "stylesheet", href = "css.css")),
+  # Version the static stylesheet so browsers cannot pair revised Overview
+  # markup with an older cached layout (large intrinsic SVGs otherwise leak).
+  header = tags$head(tags$link(
+    rel = "stylesheet",
+    href = "css.css?v=20260811-wave1b"
+  )),
   sidebar = sidebar(
     open = TRUE,
     title = "Global controls",
@@ -52,8 +98,7 @@ ui <- page_navbar(
                 min = 0.5, max = 3, value = 1, step = 0.1),
     # Signed power, not a plain exponent: about half the difficulty scores are
     # negative, and a negative base with a fractional K returns NaN.
-    helpText("Weighted goal = sign(Difficulty_Score) × |Difficulty_Score| ^ K. ",
-             "K = 1 is the base weighting."),
+    weight_formula_panel(),
     checkboxInput("exclude_pen", "Exclude penalty goals", value = FALSE),
     actionButton("run_boot", "Update analysis", class = "btn-primary w-100"),
     hr(),
