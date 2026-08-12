@@ -130,6 +130,13 @@ mod_overview_ui <- function(id) {
     tags$br(),
 
     # --- KPI cards (server-rendered) ---------------------------------------
+    div(
+      class = "overview-baseline",
+      span(
+        "Baseline: K=1 · penalties included",
+        class = "overview-baseline__label"
+      )
+    ),
     uiOutput(ns("kpi_cards")),
 
     tags$hr(),

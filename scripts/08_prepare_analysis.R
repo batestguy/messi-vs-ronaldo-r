@@ -9,6 +9,7 @@
 # Output:
 #   data/processed/analysis_bundle.rds      (single RDS consumed by the app)
 #   app/data/analysis_bundle.rds            (copy inside the app dir for rsconnect/Docker)
+#   app/data/goals_master_final.csv          (exact source copy for Wave 5 Raw Data)
 #
 # Methodology constraints honoured (see AGENTS.md):
 #   * ONE global FAMD on both players, never re-run in the app.
@@ -38,6 +39,7 @@ MC_PATH <- file.path(BASE, "data/processed/match_context.rds")
 FA_PATH <- file.path(BASE, "data/processed/famd_loadings.rds")
 OUT     <- file.path(BASE, "data/processed/analysis_bundle.rds")
 APP_OUT <- file.path(BASE, "app/data/analysis_bundle.rds")
+APP_RAW <- file.path(BASE, "app/data/goals_master_final.csv")
 
 stopifnot(file.exists(G_PATH), file.exists(MC_PATH), file.exists(FA_PATH))
 dir.create(dirname(APP_OUT), recursive = TRUE, showWarnings = FALSE)
@@ -226,6 +228,7 @@ bundle <- list(
 
 saveRDS(bundle, OUT, version = 3)
 file.copy(OUT, APP_OUT, overwrite = TRUE)
+file.copy(G_PATH, APP_RAW, overwrite = TRUE, copy.mode = TRUE)
 
 ## ---------------------------------------------------------------------------
 ## 9. Report

@@ -1,6 +1,6 @@
 # Phase 2 — Interactive Dashboard (Messi vs Ronaldo)
 
-Status: **Wave 1 revision complete; paused before Wave 2** (user-approved wave-by-wave review model).
+Status: **Paused at the fully verified Wave 6 review gate; resume with Wave 7 only after a new user instruction** (user-approved wave-by-wave review model).
 Phase 1 complete: `a3c0a7f` (pipeline) + `016ff08` (docs). Working tree clean at start of Phase 2.
 
 ## Deliverable
@@ -58,27 +58,53 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 - No analytical calculations, bundle schemas, package dependencies, or public data files changed.
 - Full implementation and verification record: `.opencode/plans/phase2-handoff.md`.
 
-### Wave 2 — Weighting (core methodology tab)
-- K-slider sensitivity stress-test vs Weighted per 90 (line over K, both players).
-- Reality Check: raw vs weighted bar chart for both players.
-- Difficulty distribution density plot (goal-level) + goal-count by difficulty decile.
+### Wave 2 — Weighting (complete)
+- Guided Weighting Lab with four live cards: both selected-K weighted rates, Messi−Ronaldo gap, and computed lead-stability status across all 26 K values.
+- Precomputed signed-power sensitivity grid for both penalty settings; slider movement selects stored rows and never invokes bootstrap work.
+- Plotly K-sensitivity hero curve, Reality Check, normalized K=1 difficulty density, and fixed global difficulty-decile goal counts with accessible text summaries.
+- Penalty toggle applies to all Wave 2 goal numerators while every per-90 denominator retains all 2,201 valid appearances, including 1,063 scoreless appearances.
+- Overview remains the fixed K=1/all-goals baseline and now displays that contract explicitly.
+- Responsive layouts stack below 1200 px; stylesheet cache token is `css.css?v=20260811-wave2`.
+- Source/data/runtime checks and live-browser passes at 1919×862 and 390×844 are complete. The corrected decile tooltip was verified with penalties included and excluded; no placeholders, horizontal overflow, Shiny output errors, or new console errors remain.
 
-### Wave 3 — Head-to-Head
-- Cumulative weighted-goals trajectories (career time), age-axis comparison.
-- Opponent Elo scatter (per-goal, loess, no bins).
-- Penalty analysis (PK vs open play per player; PK-free weighting toggle).
-- Comp filter, venue filter.
+### Wave 3 — Head-to-Head (complete)
+- Competition and venue filters live in shared state but apply only to Head-to-Head in this wave. Numerators and all-valid-appearance denominators use the same selected scope.
+- Four selected-scope cards report both weighted index rates per 90, the Messi−Ronaldo gap, and weighted-goal coverage, with distinct `N/A` and zero-output states.
+- Age-aligned or calendar-date trajectories show cumulative selected-K weighted index or rolling 30-filtered-appearance weighted index per 90. Age uses fixed birth-date display metadata and shows an age-30 guide only on the age axis.
+- The opponent-Elo view keeps one unjittered marker per eligible goal and overlays guarded, descriptive player LOESS curves without bins, confidence bands, or inference.
+- The penalty-dependency chart always discloses raw penalty/open-play counts and shares. Excluded penalty segments remain visible but muted while headline, trajectory, and Elo views follow the penalty toggle.
+- Missing difficulty, centred negative index values, filtered denominators, sparse scopes, descriptive LOESS, and the absence of Wave 4 confidence intervals are disclosed in the UI.
+- Bundle/schema/dependencies/FAMD remain unchanged; the stylesheet cache token is `css.css?v=20260812-wave3`.
+- Source, interaction, HTTP, and live-browser checks passed at 1919×862 and 390×844 with no overflow or Shiny output errors. Exact verification values and representative-filter results are in `.opencode/plans/phase2-handoff.md`.
 
-### Wave 4 — Inference
-- "Update Analysis" button → match-level bootstrap (10k), density of difference + CI band, Cohen's d, asymmetry (Messi > Ronaldo) probability. Subgroup table (by era/comp).
+### Wave 4 — Inference (complete)
+- `Update analysis` freezes K, penalty, competition, and venue; control changes do not rerun inference and show a stale-results notice until the next click.
+- Eligible goal contributions are joined to all valid appearances with the established match key, preserving scoreless rows and all selected-scope minutes.
+- 10,000 deterministic, independent within-player match resamples use seed `20260812`; each replicate preserves the player's selected-scope appearance count and computes the ratio-of-sums weighted index per 90.
+- Four result cards report the observed Messi-Ronaldo gap, 95% percentile interval, directional probability above zero, and conventional pooled-SD appearance-level Cohen's d without p-values or binary winner/significance flags.
+- The Plotly density includes interval shading, zero and observed reference lines, formatted hover text, and an accessible numerical summary.
+- Career-era and competition-family tables are both precomputed on the click. Descriptive rates remain available with appearances; intervals and d require at least two appearances per player; fewer than 30 for either player is marked sparse.
+- Empty and one-player scopes use `N/A` and explanatory states. Missing-difficulty goals contribute zero to weighted numerators and remain disclosed.
+- The stylesheet token is `css.css?v=20260812-wave4`. No bundle, FAMD, dependency, or source-data change was made.
+- The Wave 4 study guide is retained as `output/pdf/Messi_vs_Ronaldo_Statistics_Explained.pdf`; the Word intermediate and temporary renders were removed after full visual/text validation.
 
-### Wave 5 — Methodology / Summary / Raw Data
-- Methodology: step-by-step narrative (data collection, FAMD, weighting, bootstrap) with math explanation.
-- Summary: definitive head-to-head table (weighted & raw across dimensions).
-- Raw data: DT table of `goals_master_final.csv`.
+### Wave 5 — Methodology / Summary / Raw Data (complete)
+- Methodology now presents the full data-collection → global FAMD → signed-power weighting → all-valid-minute rate → match-bootstrap chain with native offline MathML, exact coverage disclosures, stored Dim 1 variance, and reconstructed input contributions. FAMD is never rerun.
+- Summary provides a fixed K=1/all-goals career reference and an immediately reactive selected-scope view. Both contain overall, five career-era, five competition-family, and three venue rows (14 fixed rows) with appearances/minutes, weighted rates/gaps, and raw rates/gaps.
+- The fixed reference is isolated from sidebar changes. The live view follows K, penalty, competition, and venue without invoking or depending on the Inference button; `N/A` remains distinct from a real zero.
+- Raw Data loads the exact 1,738 × 29 `goals_master_final.csv` as character data, supports global and per-column search, sorting, pagination, internal horizontal scrolling, and a byte-identical download. Sidebar controls do not affect it.
+- `scripts/08_prepare_analysis.R` now copies that source CSV exactly into `app/data/` when rebuilding the existing bundle; the analysis-bundle schema and FAMD artifacts remain unchanged.
+- Responsive desktop/mobile checks pass at 1919×862 and 390×844. The stylesheet token is `css.css?v=20260812-wave5`; root, CSS, and portrait requests return HTTP 200; the offline favicon removes the prior console 404.
+- `tests/wave5_content_checks.R` and the Wave 4 regression suite pass. Exact source/app/download MD5 is `c43c3f995b1f301b4328c846eab2cf27`.
+- The retained 29-page Wave 5 study guide is `output/pdf/Messi_vs_Ronaldo_Statistics_Explained.pdf`; extracted text, page geometry/bounds, pagination, and all rendered pages were validated, and the Word intermediate and temporary renders were removed.
 
-### Wave 6 — Polish
-- Loader UX (waiter), `bindCache()` per plot, mobile responsive layout, final visual pass.
+### Wave 6 — Polish (complete; awaiting review)
+- Native `shiny::busyIndicatorOptions()` supplies delayed output spinners, fade treatment, and a branded page pulse; no package dependency was added.
+- All eight Plotly outputs across Weighting, Head-to-Head, and Inference are wrapped in `shiny::bindCache()`. The Inference density key uses the bundle build stamp and the frozen K/penalty/competition/venue snapshot.
+- The analysis sidebar opens on desktop and initializes collapsed on mobile. Safe-area padding, internal wide-table scrolling, narrow formula containment, explicit focus rings, compact Plotly modebars, and reduced-motion overrides complete the responsive pass.
+- Versioned local `app.js?v=20260812-wave6` adds a keyboard skip link/main focus target and debounced polite loading announcements without external assets.
+- Versioned CSS is `css.css?v=20260812-wave6`. The bundle schema, source data, global FAMD, module APIs, signed-power formula, all-valid-minute denominators, and six-package runtime remain unchanged.
+- Wave 4, Wave 5, and new Wave 6 regressions pass. Browser checks cover all tabs at 1919×862 and 390×844 plus 768×1024 and 320×700 containment, native loading feedback, keyboard skip-link activation, zero console warnings/errors, and HTTP 200 for root/CSS/JS/portrait.
 
 ### ~~Wave 7.0 — Repair `renv.lock`~~ — RESOLVED 2026-08-09 by removing renv
 
