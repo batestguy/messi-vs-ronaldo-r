@@ -1,6 +1,6 @@
 # Phase 2 — Interactive Dashboard (Messi vs Ronaldo)
 
-Status: **Phase 2 is complete: Wave 8 is deployed, documented, and approved for final GitHub commit/push** (user-approved wave-by-wave review model).
+Status: **Project complete: Wave 8 is deployed, documented, public, accepted, and locally closed** (user-approved wave-by-wave review model).
 Phase 1 complete: `a3c0a7f` (pipeline) + `016ff08` (docs). Working tree clean at start of Phase 2.
 
 ## Deliverable
@@ -98,7 +98,7 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 - `tests/wave5_content_checks.R` and the Wave 4 regression suite pass. Exact source/app/download MD5 is `c43c3f995b1f301b4328c846eab2cf27`.
 - The retained 29-page Wave 5 study guide is `output/pdf/Messi_vs_Ronaldo_Statistics_Explained.pdf`; extracted text, page geometry/bounds, pagination, and all rendered pages were validated, and the Word intermediate and temporary renders were removed.
 
-### Wave 6 — Polish (complete; awaiting review)
+### Wave 6 — Polish (complete and accepted)
 - Native `shiny::busyIndicatorOptions()` supplies delayed output spinners, fade treatment, and a branded page pulse; no package dependency was added.
 - All eight Plotly outputs across Weighting, Head-to-Head, and Inference are wrapped in `shiny::bindCache()`. The Inference density key uses the bundle build stamp and the frozen K/penalty/competition/venue snapshot.
 - The analysis sidebar opens on desktop and initializes collapsed on mobile. Safe-area padding, internal wide-table scrolling, narrow formula containment, explicit focus rings, compact Plotly modebars, and reduced-motion overrides complete the responsive pass.
@@ -117,7 +117,7 @@ the container needs six packages and never runs FAMD, so the precomputed `.rds` 
 delivers what the lockfile was meant to guarantee. Wave 7 is no longer blocked.
 
 ### Wave 7 — Docker
-- **Complete and verified 2026-08-15; awaiting review.** `Dockerfile`
+- **Complete, verified, and accepted 2026-08-15.** `Dockerfile`
   (`rocker/shiny-verse:4.5.0` pinned by digest, multi-stage, non-root,
   HEALTHCHECK, port 3838) + `.dockerignore`; app-only context; no
   worldfootballR/FactoMineR at runtime.

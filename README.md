@@ -271,6 +271,7 @@ account metadata.
 - [Simple statistics study guide — PDF](output/pdf/Messi_vs_Ronaldo_Statistics_Explained.pdf)
 - [Editable study guide — Word](output/word/Messi_vs_Ronaldo_Statistics_Explained.docx)
 - [Architecture and methodology](docs/ARCHITECTURE.md)
+- [Project closeout and reusable skills](docs/PROJECT_CLOSEOUT.md)
 - [Data dictionary](data/data_dictionary.md)
 - [Docker guide](DOCKER.md)
 - [Image and club-mark attributions](app/www/ATTRIBUTIONS.md)
@@ -292,4 +293,6 @@ is added and the underlying source terms are reviewed.
 Phase 1 data collection and Phase 2 dashboard Waves 0–8 are complete. The
 dashboard was publicly deployed and fully reverified on 2026-08-15. The
 canonical project remains on the D: drive; no temporary C: project copy is
-required for normal use.
+required for normal use. Local Shiny and Docker services are stopped, the
+repository is public, and the final operational state is recorded in the
+[project closeout](docs/PROJECT_CLOSEOUT.md).

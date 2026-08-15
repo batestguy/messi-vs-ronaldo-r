@@ -1,25 +1,33 @@
 # Phase 2 Handoff
 
 Date: 2026-08-15
-Status: **Phase 2 complete; public deployment accepted and final GitHub closure authorized**
+Status: **Project complete; public deployment and repository accepted; local services closed**
 
-## Resume Point
+## Final Closeout
 
-Wave 8 is complete. The verified public application is live at
+Wave 8 and the complete project are closed. The verified public application is live at
 `https://qqxot9-batest-hommie.shinyapps.io/messi-vs-ronaldo-r/` under content
 ID `17705139`. The final linked deployment is bundle `12413528`. The user
-accepted the live experience and authorized the final documentation commit and
-push to `origin/main`. Do not begin a new phase, change source data, or rebuild
-the analysis bundle. Future approved app changes can be published with the same
-plain `Rscript scripts/09_deploy_shinyapps.R` command; the ignored
-`app/rsconnect/` record safely links updates to this application.
+accepted the live experience and closed the project. The GitHub repository is
+public at `https://github.com/batestguy/messi-vs-ronaldo-r`. Do not begin a new
+phase, change source data, or rebuild the analysis bundle without a new user
+request. Future approved app changes can be published with the same plain
+`Rscript scripts/09_deploy_shinyapps.R` command; the ignored `app/rsconnect/`
+record safely links updates to this application.
+
+The local Shiny listener and Docker Desktop are stopped. Port 3838 is closed.
+Docker was verified healthy after its disposable data was removed, then stopped;
+it retains zero images, containers, volumes, or build cache. Its clean WSL disk
+is 1.50 GiB. Ubuntu WSL, the user R library, Python installations, rsconnect
+credentials, and the public shinyapps.io deployment were preserved. See
+`docs/PROJECT_CLOSEOUT.md` for the reusable skills and final operating record.
 
 - Wave 0 is committed as `92271d9`.
 - The original Wave 1 implementation is committed as `4450c03`.
 - The 2026-08-11 Wave 1 revision is committed as `94d260c` (`feat: expand
   Wave 1 profiles and weighting guidance`).
 - Phase 1 remains complete at `a3c0a7f` (pipeline) + `016ff08` (docs).
-- Local `main` tracks `origin/main` at the private GitHub repository
+- Local `main` tracks `origin/main` at the public GitHub repository
   `https://github.com/batestguy/messi-vs-ronaldo-r`.
 - For the 2026-08-15 user review, the dashboard was launched through
   `Rscript app/run.R` at `http://127.0.0.1:3838` and intentionally left
@@ -197,15 +205,13 @@ data files changed. The Overview KPI values remain:
 
 - Repository: `batestguy/messi-vs-ronaldo-r`.
 - Remote URL: `https://github.com/batestguy/messi-vs-ronaldo-r.git`.
-- Visibility: private.
+- Visibility: public.
 - Default branch: `main`.
 - Local `main` tracks `origin/main`; the post-push ahead/behind count was
   `0 0`.
 - GitHub associates commit `94d260c856c0a385f375c4fe5c8b01f5dc92050e`
   with the `batestguy` profile and commit email `batesthommie@gmail.com`.
-- Private contribution activity appears on the public profile only when the
-  GitHub “Private contributions” setting is enabled; repository details remain
-  private.
+- Repository content and commit history are publicly visible.
 
 No force push or history rewrite was used.
 
@@ -235,10 +241,10 @@ not edit the repository.
 The global skill is installed on this machine and is not part of the project
 repository or GitHub history.
 
-## Next Step — Review Gate
+## Closeout Rule
 
-Wave 4 implementation and verification are complete. Present it for user
-review and stop. **Do not begin Wave 5 without a new user instruction.**
+The project is complete. Keep all local services stopped and do not begin a new
+phase unless the user explicitly reopens the project.
 
 
 ## Wave 2 — Weighting Lab Implementation Record
@@ -1102,5 +1108,5 @@ updates.
   resolves, the live dashboard returns HTTP 200, and the repository scan finds
   no credential-like values. The screenshot console log contained zero
   warnings/errors and its temporary Playwright artifacts were removed.
-- The repository remains private. Its GitHub homepage is the public dashboard;
+- The repository is public. Its GitHub homepage is the public dashboard;
   no project-wide license or release tag is invented during closure.
