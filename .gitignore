@@ -17,6 +17,9 @@ kaggle.json
 *.pem
 secrets/
 
+# --- Local publishing metadata (account/app IDs, never source) ---
+app/rsconnect/
+
 # --- OS / editor cruft ---
 .DS_Store
 Thumbs.db

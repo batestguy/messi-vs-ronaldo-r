@@ -6,8 +6,45 @@
 # The guards below turn the three ways this launch usually fails into readable
 # errors. Each one has cost a debugging session at least once.
 
-APP_PORT <- 3838L
-APP_HOST <- "127.0.0.1"
+port_text <- trimws(Sys.getenv("SHINY_PORT", unset = "3838"))
+if (!grepl("^[0-9]+$", port_text)) {
+  stop("SHINY_PORT must be an integer from 1 to 65535.", call. = FALSE)
+}
+
+APP_PORT <- suppressWarnings(as.integer(port_text))
+if (is.na(APP_PORT) || APP_PORT < 1L || APP_PORT > 65535L) {
+  stop("SHINY_PORT must be an integer from 1 to 65535.", call. = FALSE)
+}
+
+APP_HOST <- trimws(Sys.getenv("SHINY_HOST", unset = "127.0.0.1"))
+if (!APP_HOST %in% c("127.0.0.1", "0.0.0.0", "::")) {
+  stop(
+    "SHINY_HOST must be one of 127.0.0.1, 0.0.0.0, or ::.",
+    call. = FALSE
+  )
+}
+
+json_escape <- function(value) {
+  value <- gsub("\\\\", "\\\\\\\\", as.character(value), fixed = TRUE)
+  value <- gsub('"', '\\"', value, fixed = TRUE)
+  value <- gsub("\r", "\\\\r", value, fixed = TRUE)
+  gsub("\n", "\\\\n", value, fixed = TRUE)
+}
+
+log_event <- function(level, event, message = NULL) {
+  fields <- c(
+    sprintf('"timestamp":"%s"', format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")),
+    sprintf('"level":"%s"', json_escape(level)),
+    sprintf('"event":"%s"', json_escape(event)),
+    sprintf('"host":"%s"', json_escape(APP_HOST)),
+    sprintf('"port":%d', APP_PORT)
+  )
+  if (!is.null(message)) {
+    fields <- c(fields, sprintf('"message":"%s"', json_escape(message)))
+  }
+  cat("{", paste(fields, collapse = ","), "}\n", sep = "")
+  flush.console()
+}
 
 # --- Guard 1: the Shiny stack is installed -----------------------------------
 # library(shiny) on its own dies with a bare "there is no package called 'shiny'",
@@ -37,7 +74,7 @@ app_dir  <- if (length(file_arg)) {
 # "Failed to create server", which reads like an app crash. Connecting
 # successfully means something is already listening.
 con <- suppressWarnings(try(
-  socketConnection(APP_HOST, APP_PORT, open = "r+", blocking = TRUE, timeout = 1),
+  socketConnection("127.0.0.1", APP_PORT, open = "r+", blocking = TRUE, timeout = 1),
   silent = TRUE))
 if (!inherits(con, "try-error")) {
   close(con)
@@ -50,9 +87,21 @@ if (!inherits(con, "try-error")) {
 
 suppressPackageStartupMessages(library(shiny))
 
-shiny::runApp(
-  appDir = app_dir,
-  port = APP_PORT,
-  host = APP_HOST,
-  launch.browser = FALSE
-)
+log_event("info", "app_start")
+exit_status <- tryCatch({
+  shiny::runApp(
+    appDir = app_dir,
+    port = APP_PORT,
+    host = APP_HOST,
+    launch.browser = FALSE,
+    quiet = TRUE
+  )
+  0L
+}, error = function(error) {
+  log_event("error", "app_failure", conditionMessage(error))
+  1L
+})
+
+if (exit_status != 0L) {
+  quit(save = "no", status = exit_status, runLast = FALSE)
+}

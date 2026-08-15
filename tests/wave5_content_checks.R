@@ -199,7 +199,7 @@ stopifnot(
   grepl("Definitive comparison table", summary_html, fixed = TRUE),
   grepl("Download exact CSV", data_html, fixed = TRUE),
   grepl("role=\"region\"", data_html, fixed = TRUE),
-  grepl("css.css?v=20260812-wave6", paste(readLines("app/app.R"), collapse = "\n"), fixed = TRUE)
+  grepl("css.css?v=20260815-review1", paste(readLines("app/app.R"), collapse = "\n"), fixed = TRUE)
 )
 
 state <- reactiveValues(

@@ -1,24 +1,18 @@
 # Phase 2 Handoff
 
-Date: 2026-08-12
-Status: **Paused at the fully verified Wave 6 review gate**
+Date: 2026-08-15
+Status: **Phase 2 complete; public deployment accepted and final GitHub closure authorized**
 
 ## Resume Point
 
-Wave 6 completes the final pre-container polish: native Shiny loading feedback,
-full Plotly cache coverage, desktop/mobile sidebar behavior, keyboard focus
-navigation, polite loading announcements, reduced-motion support, safe-area
-spacing, and responsive containment. It preserves the bundle schema, global
-FAMD, six-package runtime, signed-power rule, all-valid-minute denominators,
-and button-frozen Inference contract. **Do not begin Wave 7 without a new user
-instruction.** Present Wave 6 for review and wait at this gate.
-
-Checkpoint requested on 2026-08-12: development is intentionally paused here.
-The next authorized implementation wave is Wave 7 (Docker): use
-`rocker/shiny-verse:4.5.0`, the dated Posit PPM snapshot, exactly the six
-documented runtime packages, the non-root `shiny` user, port 3838, and an HTTP
-health check. Do not restore renv, begin Wave 8 deployment, push, or deploy
-without a separate user instruction.
+Wave 8 is complete. The verified public application is live at
+`https://qqxot9-batest-hommie.shinyapps.io/messi-vs-ronaldo-r/` under content
+ID `17705139`. The final linked deployment is bundle `12413528`. The user
+accepted the live experience and authorized the final documentation commit and
+push to `origin/main`. Do not begin a new phase, change source data, or rebuild
+the analysis bundle. Future approved app changes can be published with the same
+plain `Rscript scripts/09_deploy_shinyapps.R` command; the ignored
+`app/rsconnect/` record safely links updates to this application.
 
 - Wave 0 is committed as `92271d9`.
 - The original Wave 1 implementation is committed as `4450c03`.
@@ -27,7 +21,10 @@ without a separate user instruction.
 - Phase 1 remains complete at `a3c0a7f` (pipeline) + `016ff08` (docs).
 - Local `main` tracks `origin/main` at the private GitHub repository
   `https://github.com/batestguy/messi-vs-ronaldo-r`.
-- The dashboard was stopped for a clean exit. Relaunch with `Rscript app/run.R`.
+- For the 2026-08-15 user review, the dashboard was launched through
+  `Rscript app/run.R` at `http://127.0.0.1:3838` and intentionally left
+  running. If that listener is no longer present, relaunch with the same
+  command from the repository root.
 
 ## Launch and Refresh Contract
 
@@ -41,7 +38,7 @@ Do not run `Rscript app/app.R`; that launch path does not serve `app/www/`
 reliably. There is no renv and there are no command flags.
 
 Restart the R process after source changes. The custom stylesheet is linked as
-`css.css?v=20260812-wave5` in `app/app.R`. If future work changes CSS and a
+`css.css?v=20260815-review1` in `app/app.R`. If future work changes CSS and a
 browser displays new markup with stale styles, bump this version token and
 reload the page.
 
@@ -850,14 +847,260 @@ Wave 6 work was performed. The app was stopped after final verification.
 | `.opencode/plans/phase2-plan.md` | Wave 6 completed scope and review status |
 | `.opencode/plans/phase2-handoff.md` | This implementation and resume record |
 
-No PDF update was required because Wave 6 changes presentation and interaction
-only; the retained verified Wave 5 study guide remains unchanged. No commit,
-push, deployment, bundle rebuild, dependency installation, Docker/Wave 7 work,
-or source-data change was performed. The app and Playwright session were
-stopped after final verification.
+The original Wave 6 implementation did not require a PDF change because it was
+presentation-only. On 2026-08-15, the user explicitly requested a refreshed
+plain-language guide through the current checkpoint; that post-gate
+documentation work is recorded below. No app calculation changed.
+
+## Post-Wave 6 Documentation and Skill Refresh — 2026-08-15
+
+- `scripts/build_statistics_guide.py` now verifies Wave 6 source contracts
+  before writing: native busy feedback, desktop/mobile sidebar policy,
+  versioned local CSS/JavaScript, eight cached Plotly outputs, skip-link/live
+  announcements, and reduced-motion CSS.
+- The guide adds page 30, **How the finished interface supports careful
+  reading**, and stops at the Wave 6 review gate. It explicitly separates
+  usability/performance work from unchanged data and statistical methods.
+- Matching retained outputs are
+  `output/word/Messi_vs_Ronaldo_Statistics_Explained.docx` and
+  `output/pdf/Messi_vs_Ronaldo_Statistics_Explained.pdf`.
+- LibreOffice produced the PDF from the Word source. The paired validator
+  reports 30 PDF pages and 60 real Word headings; all 30 pages have content,
+  612×792-point portrait geometry, in-bounds text blocks, page footers,
+  matching substantive tokens, and six embedded fonts.
+- Every page was rendered locally. Five six-page contact sheets plus detailed
+  checks of the changed contents, Raw Data, and Wave 6 pages showed no clipping,
+  overlap, broken tables, broken glyphs, empty pages, or inconsistent
+  pagination. Temporary renders are removed after verification.
+- The reusable `$simple-explanation-docs` package is valid at both
+  `.agents/skills/simple-explanation-docs/` and
+  `C:/Users/TOSHIBA/.codex/skills/simple-explanation-docs/`. `SKILL.md`, the
+  content reference, paired-output validator, and `agents/openai.yaml` have
+  identical SHA-256 hashes in both copies.
+- Wave 4, Wave 5, and Wave 6 regression suites pass unchanged. The seeded
+  default remains gap `+0.0952554179`, interval
+  `[-0.0119600327, +0.1999414634]`, probability `0.96`, and Cohen's d
+  `+0.0899711631`.
+- The local preview was launched only through `Rscript app/run.R`. Root,
+  `css.css?v=20260815-review1`, `app.js?v=20260812-wave6`, and both player
+  portraits returned HTTP 200 with non-empty expected content types. The
+  system default browser was opened to `http://127.0.0.1:3838` for user-led
+  navigation and change detection, and the R process was left running.
+
+This refresh does not authorize a commit, push, deployment, bundle rebuild,
+dependency change, Docker/Wave 7 work, or source-data change.
+
+## Post-Wave 6 Local Navigation Review Repair — 2026-08-15
+
+- The user screenshot exposed a presentation defect: all seven tab elements
+  existed and were clickable, but the brand and inactive tab labels inherited
+  white text on the white navbar. Only the active tab was visible.
+- `app/www/css.css` now gives the navbar brand, inactive tabs, active tab,
+  hover/focus states, and both desktop/mobile navigation controls explicit
+  readable colors. `app/app.R` uses `css.css?v=20260815-review1`; the Wave 5,
+  Wave 6, and guide source-contract checks expect the same token.
+- Desktop 1919×862 computed colors are dark brand `rgb(23, 32, 42)`, inactive
+  tabs `rgb(67, 87, 106)`, and active teal `rgb(28, 124, 125)`. All seven tabs
+  are visible and the page width is exactly 1919 px.
+- Every page was opened successfully with zero Shiny output errors: Overview,
+  Weighting, Head-to-Head, Inference, Methodology, Summary, and Raw Data.
+- Live controls were exercised and restored to K 1.0, penalties included, all
+  competitions, and all venues. Penalty exclusion changed the Weighting gap
+  from +0.0953 to +0.0600; Champions Lg/Away updated Head-to-Head immediately.
+- `Update analysis` refreshed the frozen default Inference snapshot to 2,201
+  appearances and 181,081 minutes with gap +0.0953, interval
+  [-0.0120, +0.1999], probability 0.960, and Cohen''s d +0.090. Changing K
+  showed the stale-state notice without rerunning; restoring K 1.0 matched the
+  clicked snapshot again.
+- Summary reproduced the fixed baseline, and Raw Data search reduced 1,738
+  rows to 891 Ronaldo goals before clearing back to all 1,738.
+- At 390×844, the `Toggle navigation` button opens all seven page links, the
+  mobile document width remains 390 px, and the navigation control is dark.
+  The final browser console contains zero errors and zero warnings.
+
+This was a Wave 6 review repair only. It did not change data, calculations,
+dependencies, module interfaces, the guide contents, or the review gate, and
+it does not authorize Wave 7.
 
 ## Resolved Environment Decision — No renv
 
 renv was removed on 2026-08-09. `renv.lock`, `renv/`, and `.Rprofile` are gone;
-do not recreate them. Wave 7 will pin its six runtime packages through a dated
+do not recreate them. Wave 7 pins its six runtime packages through a dated
 Posit PPM snapshot. The full rationale is in `AGENTS.md` under *On renv*.
+
+## Wave 7 — Docker Implementation and Verification Record
+
+### Container build and runtime contract
+
+- `Dockerfile` is a two-stage build pinned to
+  `rocker/shiny-verse:4.5.0@sha256:ccafdf812938dc85891b198f0728c8bf1706f1b0b7558b9fe696e98eb116056a`.
+- The package stage installs only `shiny`, `bslib`, `data.table`, `htmltools`,
+  `plotly`, and `DT` from the dated 2026-08-09 Posit PPM snapshot.
+- `app/Rprofile.container` puts `/opt/messi-library` first only inside the
+  image. Local D: launches still use the normal user library and no project
+  `.Rprofile` or renv was introduced.
+- `app/run.R` accepts validated `SHINY_HOST`/`SHINY_PORT` values, keeps the
+  established local defaults, detects occupied port 3838, and emits structured
+  JSON startup/failure records. The container sets `0.0.0.0:3838`; local use
+  remains `127.0.0.1:3838` through `Rscript app/run.R`.
+- `tests/wave7_container_checks.R` verifies the pinned image, app-only context,
+  six-package contract, non-root runtime, health check, launch path, unchanged
+  bundle schema, source counts, signed power, and all-valid-minute denominator.
+  `tests/wave7_runtime_probe.R` verifies the installed package versions and
+  exclusion of scraping/FAMD packages inside the running image.
+
+### Exact verified results
+
+- The C: staging context was hash-matched to D: before build: 28 files,
+  1,978,126 bytes.
+- Final image ID/digest:
+  `sha256:7208f22dbc8fe13386977e55c3afd0524c1daea5eabc414bf8159d8b74d9d91f`;
+  size 786,851,392 bytes.
+- Runtime library order began with `/opt/messi-library`. Loaded versions were
+  shiny 1.14.0, bslib 0.12.0, data.table 1.18.4, htmltools 0.5.9,
+  plotly 4.12.1, and DT 0.34.0. FactoMineR and worldfootballR were absent.
+- The container ran as UID/GID 997 (`shiny`) with 2 GB memory, one CPU,
+  `CapDrop=[ALL]`, and `no-new-privileges=true`; its health status was healthy.
+- Logs contained one JSON `app_start` record. Root,
+  `css.css?v=20260815-review1`, `app.js`, `/img/messi.jpg`, and
+  `/img/ronaldo.jpg` returned HTTP 200.
+- Desktop 1919×862 and mobile 390×844 browser checks exercised all seven tabs,
+  Weighting penalty behavior, Champions Lg/Away Head-to-Head filtering,
+  button-triggered and stale-state Inference, Methodology, Summary, and Raw
+  Data search (1,738 → 891 → 1,738). Both viewports had exact document width,
+  zero Shiny output errors, and zero browser-console warnings/errors.
+- The default frozen Inference remained gap +0.0953, interval
+  [-0.0120, +0.1999], probability 0.960, and Cohen's d +0.090. The Wave 4–7
+  host regression suite passed; the exact source CSV MD5 remains
+  `c43c3f995b1f301b4328c846eab2cf27`.
+- Docker Scout was not run because its external service could upload the
+  private local image. No source, package, or image was transmitted.
+
+### Disposable C: workspace cleanup
+
+The temporary location was
+`C:\Users\TOSHIBA\AppData\Local\MessivsRonaldoR\wave7-build-context`.
+After verification, the named test container, tagged final image, three exact
+untagged earlier Wave 7 image IDs, dedicated `messi-wave7-builder`, temporary
+browser artifacts, staging directory, and its empty parent were removed. A
+final inventory found no Wave 7 container, image, builder, C: path, or browser
+artifact. Only the general Docker Desktop/buildkit installation remains.
+
+After cleanup, the canonical D: app was relaunched only through
+`Rscript app/run.R`; `http://127.0.0.1:3838/` returned HTTP 200 and was opened
+in the user's default browser for review. Stop that R process when the review
+session is finished.
+
+### Wave 7 gate
+
+No commit, push, deployment, renv restoration, source-data change, bundle
+rebuild, or Wave 8 work was performed. The next possible wave is Wave 8
+(shinyapps.io deployment) and requires a new explicit user instruction.
+
+## Wave 8 — Public Deployment and Verification Record
+
+### Deployment implementation
+
+- `scripts/09_deploy_shinyapps.R` fixes the public app name to
+  `messi-vs-ronaldo-r` and the server to `shinyapps.io`.
+- Its upload allowlist contains exactly 24 files (1,971,888 bytes after the
+  reviewed Head-to-Head copy correction): `app.R`, eight module/theme files,
+  13 local assets, and the two required data files. `run.R`,
+  `Rprofile.container`, Docker files, analysis scripts, documentation, tests,
+  secrets, deployment records, and raw development data are excluded.
+- `rsconnect::appDependencies()` discovers the six runtime packages: shiny,
+  bslib, data.table, htmltools, plotly, and DT. FactoMineR, worldfootballR,
+  chromote, rvest, and RSelenium are absent from the deployment manifest.
+- Account credentials are read only from rsconnect's user-level store. Tokens
+  and secrets are never accepted by the script or stored in this repository.
+- A remote name collision is refused unless the local ignored deployment
+  record links this project to the same app. `app/rsconnect/` remains ignored
+  so later approved deployments update only the linked application.
+- `R/_packages.R` records rsconnect as a local-only deployment dependency; it
+  remains outside the six-package application runtime.
+- The preflight was hardened for both zero-row data-frame and `NULL` responses
+  from `rsconnect::applications()` by using `NROW()`. The initial attempts
+  stopped before upload; the corrected preflight is regression-tested.
+
+### Public application
+
+- URL: `https://qqxot9-batest-hommie.shinyapps.io/messi-vs-ronaldo-r/`
+- Account: `qqxot9-batest-hommie`
+- Content ID: `17705139`
+- Final linked bundle: `12413528`
+- Deployment command: `Rscript scripts/09_deploy_shinyapps.R`
+- The first successful create and the final linked update both completed on
+  2026-08-15. The public app remains live for user review.
+
+### Hosted verification
+
+- Root, `css.css?v=20260815-review1`, `app.js?v=20260812-wave6`,
+  `/img/messi.jpg`, and `/img/ronaldo.jpg` each return HTTP 200 with non-empty
+  expected content types.
+- Every page opens on the hosted instance: Overview, Weighting, Head-to-Head,
+  Inference, Methodology, Summary, and Raw Data.
+- Penalty exclusion changes the live overall weighted rates to Messi `0.0926`,
+  Ronaldo `0.0327`, and gap `+0.0600`, then restores cleanly.
+- Champions Lg/Away updates Head-to-Head immediately to 81 Messi appearances,
+  92 Ronaldo appearances, and gap `+0.0334`; the controls restore to all
+  competitions and all venues.
+- The default button-triggered Inference returns observed gap `+0.0953`, 95%
+  interval `[-0.0120, +0.1999]`, probability `0.960`, and Cohen's d `+0.090`
+  from 10,000 finite differences. Moving K to 1.1 leaves those results frozen
+  and displays the controls-changed notice; restoring K to 1.0 matches the
+  clicked snapshot again.
+- Summary exposes the fixed and live semantic tables. Raw Data reports 1,738
+  rows and 29 fields; searching Ronaldo returns 891 goals and clearing returns
+  all 1,738.
+- At desktop 1919x862 and mobile 390x844, document width exactly equals
+  viewport width. The mobile navigation exposes all seven tabs, wide tables
+  remain internally scrollable, and both viewports have zero Shiny output
+  errors. The final browser console reports zero errors and zero warnings.
+- A live-review defect in `app/R/mod_head2head.R` was repaired: the obsolete
+  future-tense “No uncertainty interval yet / Wave 4” caveat now says where the
+  implemented Inference workflow lives. The final linked deployment was
+  reloaded and the corrected copy was verified on the public app.
+- The transient websocket disconnect observed during the instance roll-forward
+  cleared after a fresh reload. The final session reports connected, seven
+  navigation tabs, and zero Shiny errors.
+
+### Regression and data contracts
+
+- Wave 4 through Wave 8 regression suites pass after the final copy change.
+  Exact seeded values remain gap `0.0952554179`, interval
+  `[-0.0119600327, 0.1999414634]`, probability `0.9600000000`, and Cohen's d
+  `0.0899711631`.
+- The source CSV MD5 remains `c43c3f995b1f301b4328c846eab2cf27`.
+- Contracts remain 1,738 goals, 2,201 valid appearances, 181,081 minutes,
+  1,063 scoreless appearances, three missing difficulty scores, bundle version
+  0.1.0, and finite fractional signed power.
+
+### Wave 8 closure
+
+The public experience was accepted and the user explicitly authorized the
+final GitHub documentation commit/push. No source-data change, analysis-bundle
+rebuild, renv restoration, repository-visibility change, or next-phase work is
+part of this closure. The small rsconnect credential stays in the user profile
+on C: and can be deleted later without affecting the canonical project on D:.
+The ignored deployment record stays in `app/rsconnect/` to preserve safe linked
+updates.
+
+## Final GitHub Documentation — 2026-08-15
+
+- `README.md` is the repository landing page with the live shinyapps.io link,
+  verified data/results, dashboard tour, method summary, local setup, tests,
+  Docker/deployment workflows, limitations, attribution, and project status.
+- `docs/ARCHITECTURE.md` records the collection-to-runtime data flow, FAMD and
+  bootstrap contracts, module interfaces, performance/accessibility design,
+  delivery boundaries, and layered verification strategy.
+- Four reviewed public-app screenshots are retained under `docs/screenshots/`:
+  Overview, Weighting, completed Inference, and expanded mobile navigation.
+  Desktop captures are 1600x1000; mobile is 390x844.
+- README links include the retained editable Word guide, distribution PDF,
+  data dictionary, Docker guide, attributions, phase plan, and this handoff.
+- GitHub Markdown rendering succeeds, every relative documentation link
+  resolves, the live dashboard returns HTTP 200, and the repository scan finds
+  no credential-like values. The screenshot console log contained zero
+  warnings/errors and its temporary Playwright artifacts were removed.
+- The repository remains private. Its GitHub homepage is the public dashboard;
+  no project-wide license or release tag is invented during closure.

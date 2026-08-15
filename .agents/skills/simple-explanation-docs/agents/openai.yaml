@@ -1,0 +1,4 @@
+interface:
+  display_name: "Simple Explanation Documents"
+  short_description: "Create clear matching Word and PDF guides"
+  default_prompt: "Use $simple-explanation-docs to create a clear, accurate Word and PDF guide for a curious beginner."

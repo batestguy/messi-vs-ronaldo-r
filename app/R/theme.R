@@ -2,8 +2,10 @@
 # Global visual identity for the dashboard.
 # Single source of truth for tokens, reused by every module (and later the blog).
 
-library(bslib)
-library(htmltools)
+suppressPackageStartupMessages({
+  library(bslib)
+  library(htmltools)
+})
 
 # ---------------------------------------------------------------------------
 # Brand tokens

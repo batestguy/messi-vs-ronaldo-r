@@ -902,8 +902,8 @@ mod_head2head_server <- function(id, state) {
           "LOESS uses the actual unjittered goal values and is suppressed below 10 goals or 5 distinct Elo values. It is not an inferential model."
         ),
         tags$li(
-          tags$strong("No uncertainty interval yet: "),
-          "Wave 3 reports descriptive selected-scope values only. Match-level bootstrap confidence intervals belong to Wave 4 and are not calculated here."
+          tags$strong("Where uncertainty lives: "),
+          "This Head-to-Head page remains descriptive. For match-level bootstrap intervals, directional probability, and Cohen's d under the selected scope, open Inference and select Update analysis."
         )
       )
     }), state$K, state$exclude_pen, state$competition, state$venue)

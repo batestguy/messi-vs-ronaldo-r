@@ -1,0 +1,7 @@
+# Container-only library precedence. Docker sets R_PROFILE_USER to this file;
+# local Rscript app/run.R launches do not read it.
+snapshot_library <- Sys.getenv("R_LIBS_USER", unset = "")
+if (nzchar(snapshot_library) && dir.exists(snapshot_library)) {
+  .libPaths(c(snapshot_library, .libPaths()))
+}
+rm(snapshot_library)

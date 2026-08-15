@@ -30,7 +30,7 @@ js_source <- paste(readLines("app/www/app.js", warn = FALSE), collapse = "\n")
 package_source <- paste(readLines("R/_packages.R", warn = FALSE), collapse = "\n")
 
 stopifnot(
-  grepl("css.css?v=20260812-wave6", app_source, fixed = TRUE),
+  grepl("css.css?v=20260815-review1", app_source, fixed = TRUE),
   grepl("app.js?v=20260812-wave6", app_source, fixed = TRUE),
   grepl('open = "desktop"', app_source, fixed = TRUE),
   grepl("shiny::busyIndicatorOptions(", app_source, fixed = TRUE),
@@ -56,6 +56,14 @@ stopifnot(
   grepl("safe-area-inset-bottom", css_source, fixed = TRUE),
   grepl("overscroll-behavior", css_source, fixed = TRUE),
   grepl("font-variant-numeric: tabular-nums", css_source, fixed = TRUE)
+)
+
+stopifnot(
+  grepl(".navbar .navbar-brand", css_source, fixed = TRUE),
+  grepl(".navbar .nav-link.active", css_source, fixed = TRUE),
+  grepl("color: #43576a", css_source, fixed = TRUE),
+  grepl("color: #1c7c7d", css_source, fixed = TRUE),
+  grepl(".navbar .navbar-toggler-icon", css_source, fixed = TRUE)
 )
 
 plot_files <- c(

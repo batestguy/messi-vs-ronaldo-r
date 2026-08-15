@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Build the Wave 5 statistics teaching guide as a verified Word intermediate.
+"""Build the Wave 6 statistics teaching guide as a verified Word source.
 
 Run from any working directory:
 
     python scripts/build_statistics_guide.py
 
 The script reads the committed analysis artifacts, asks plain Rscript to extract
-facts from the shipped analysis artifacts, asserts the documented Wave 5
+facts from the shipped analysis artifacts, asserts the documented Wave 6
 invariants, and writes the Word intermediate used for the retained PDF:
 
     output/word/Messi_vs_Ronaldo_Statistics_Explained.docx
@@ -50,7 +50,7 @@ PALE_TEAL = "E9F5F4"
 PALE_GRAY = "F2F5F7"
 WHITE = "FFFFFF"
 RULE = "CAD5DE"
-TOTAL_PAGES = 29
+TOTAL_PAGES = 30
 
 
 R_FACT_EXPORTER = r'''
@@ -573,6 +573,30 @@ def verify_facts(f: dict[str, str]) -> None:
     assert f["match_fields"].split("||") == [r[0] for r in flatten(MATCH_GROUPS)]
 
 
+def verify_wave6_sources() -> None:
+    """Assert the presentation-only Wave 6 claims against the shipped app."""
+    app_source = (ROOT / "app" / "app.R").read_text(encoding="utf-8")
+    plot_source = "\n".join(
+        (ROOT / "app" / "R" / name).read_text(encoding="utf-8")
+        for name in ("mod_weighting.R", "mod_head2head.R", "mod_inference.R")
+    )
+    js_source = (ROOT / "app" / "www" / "app.js").read_text(encoding="utf-8")
+    css_source = (ROOT / "app" / "www" / "css.css").read_text(encoding="utf-8")
+
+    for token in (
+        "shiny::busyIndicatorOptions(",
+        'open = "desktop"',
+        "css.css?v=20260815-review1",
+        "app.js?v=20260812-wave6",
+    ):
+        assert token in app_source, f"Wave 6 app token missing: {token}"
+    assert plot_source.count("plotly::renderPlotly({") == 8
+    assert plot_source.count("shiny::bindCache(plotly::renderPlotly({") == 8
+    for token in ("dashboard-main", "shiny:busy.wave6", "shiny:idle.wave6"):
+        assert token in js_source, f"Wave 6 JavaScript token missing: {token}"
+    assert "@media (prefers-reduced-motion: reduce)" in css_source
+
+
 def shade(cell, fill: str) -> None:
     tc_pr = cell._tc.get_or_add_tcPr()
     shd = tc_pr.find(qn("w:shd"))
@@ -863,7 +887,7 @@ def build_document(f: dict[str, str]) -> Document:
     )
     doc.add_heading("What this guide covers", level=2)
     p = doc.add_paragraph(
-        "The collected sources, the cleaning path, every completed formula and metric, the current results, and the limits of the evidence through Dashboard Wave 5."
+        "The collected sources, the cleaning path, every completed formula and metric, the current results, and the limits of the evidence through Dashboard Wave 6."
     )
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -876,7 +900,7 @@ def build_document(f: dict[str, str]) -> Document:
         ("Goals", f"{n(f, 'goal_rows'):,}"),
         ("Valid appearances", f"{n(f, 'valid_match_rows'):,}"),
         ("Valid minutes", f"{n(f, 'total_minutes'):,}"),
-        ("Coverage status", "Wave 5 complete and verified"),
+        ("Coverage status", "Wave 6 complete and verified"),
     ], [2.3, 4.8], font_size=8.5)
 
     # 2 — contents and 60 seconds
@@ -892,6 +916,7 @@ def build_document(f: dict[str, str]) -> Document:
         ("Field appendices", "29 master + 6 derived + 42 valid-match fields", "20-24"),
         ("Explain it aloud", "Glossary, speaking notes, stopping point", "25-26"),
         ("Wave 5 dashboard", "Methodology, definitive Summary, exact Raw Data", "27-29"),
+        ("Wave 6 polish", "Loading, caching, responsive behavior, accessibility", "30"),
     ]
     add_table(doc, ["Part", "What is inside", "Pages"], contents, [1.5, 4.9, 0.7], 8.2)
     doc.add_heading("The 60-second explanation", level=2)
@@ -1355,7 +1380,7 @@ def build_document(f: dict[str, str]) -> Document:
         ("“N/A and 0.0000 mean the same thing.”", "No. N/A means no appearances exist; zero means appearances exist but no eligible contribution remains."),
     ]
     add_table(doc, ["Misunderstanding", "Answer"], misunderstandings, [2.65,4.45], 7.5)
-    add_callout(doc, "Wave 5 bridge", "The next three pages document the completed Methodology, Summary, and Raw Data tabs. They preserve the same fixed formulas, all-valid-minute denominators, and source-data contract.", PALE_TEAL, TEAL)
+    add_callout(doc, "Wave 5 and 6 bridge", "The next four pages document the completed Methodology, Summary, Raw Data, and interface-polish work. They preserve the same fixed formulas, all-valid-minute denominators, and source-data contract.", PALE_TEAL, TEAL)
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     r = p.add_run("USE THE EVIDENCE • STATE THE LIMITS • DO NOT DECLARE A FINAL WINNER")
@@ -1396,8 +1421,8 @@ def build_document(f: dict[str, str]) -> Document:
     ])
     add_callout(doc, "Reading rule", "Every gap is Messi minus Ronaldo. These Summary rows are descriptive; uncertainty remains on the button-frozen Inference tab.", PALE_TEAL, TEAL)
 
-    # 29 - Wave 5 raw data and review gate
-    new_page(doc, 29, "Wave 5 raw data", "Exact source transparency and the review gate")
+    # 29 - Wave 5 raw data
+    new_page(doc, 29, "Wave 5 raw data", "Exact source transparency and the downloadable audit trail")
     add_table(doc, ["Raw-data contract", "Verified value"], [
         ("Rows × columns", f"{n(f,'raw_csv_rows'):,} × {n(f,'raw_csv_columns')}"),
         ("File size", f"{n(f,'raw_csv_bytes'):,} bytes"),
@@ -1413,10 +1438,30 @@ def build_document(f: dict[str, str]) -> Document:
         "Scroll horizontally inside the table on narrow screens; the page itself remains contained.",
         "Download the same preserved CSV used by the tab, with no current sidebar filters applied.",
     ])
-    add_callout(doc, "Stopping point", "Wave 5 is complete and verified. Methodology, Summary, and Raw Data are now fully implemented. Polish, containerization, and deployment remain in later review-gated waves and have not been started.", PALE_RED, RONALDO)
+    add_callout(doc, "Next page", "Wave 5 completed the analytical content. The final page explains Wave 6 interface polish and separates usability improvements from statistical changes.", PALE_TEAL, TEAL)
+
+    # 30 - Wave 6 polish and review gate
+    new_page(doc, 30, "Wave 6 polish", "How the finished interface supports careful reading")
+    add_table(doc, ["Area", "What changed", "Why it helps"], [
+        ("Loading feedback", "Native Shiny busy indicators plus polite updating/updated announcements", "Shows when outputs are recalculating without adding a dependency"),
+        ("Plot caching", "All eight Plotly outputs use dependency-aware caches", "Avoids unnecessary redraw work; cached results do not change the statistic"),
+        ("Sidebar behavior", "Open on desktop and initially collapsed on mobile", "Keeps controls ready on wide screens and preserves space on narrow screens"),
+        ("Keyboard access", "Visible skip link, focus target, and focus-visible styling", "Lets keyboard users move directly to dashboard content"),
+        ("Responsive layout", "Contained tables, formulas, and Plotly controls at 1919, 768, 390, and 320 px", "Prevents page-level horizontal overflow"),
+        ("Motion preference", "Reduced-motion rules suppress animated loading treatments", "Respects the reader's operating-system preference"),
+    ], [1.2, 3.25, 2.65], 7.2)
+    doc.add_heading("What Wave 6 did not change", level=2)
+    add_bullets(doc, [
+        "No source row, analysis-bundle field, global FAMD score, formula, denominator, or seeded bootstrap result changed.",
+        "The signed-power rule remains sign(Difficulty_Score) × |Difficulty_Score|ᴷ.",
+        "All 2,201 valid appearances and 181,081 minutes remain the exposure base, including 1,063 scoreless appearances.",
+        "Inference still changes only when Update analysis is clicked and still uses 10,000 match-level resamples.",
+        "The app still requires only shiny, bslib, data.table, htmltools, plotly, and DT at runtime.",
+    ])
+    add_callout(doc, "Stopping point", "Wave 6 is complete and verified. The analytical dashboard and its usability polish are ready for local review. Containerization and deployment remain in later review-gated waves and have not been started.", PALE_RED, RONALDO)
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = p.add_run("STOP AT THE WAVE 5 REVIEW GATE")
+    r = p.add_run("STOP AT THE WAVE 6 REVIEW GATE")
     r.font.size = Pt(10); r.font.bold = True; r.font.color.rgb = RGBColor.from_string(TEAL)
 
     normalize_output_dashes(doc)
@@ -1449,9 +1494,12 @@ def verify_docx(path: Path) -> None:
         "Career-era subgroup results", "Competition-family results and Cohen's d",
         "The complete analysis map, from source rows to uncertainty",
         "The fixed career reference and venue comparison",
-        "Exact source transparency and the review gate",
+        "Exact source transparency and the downloadable audit trail",
+        "How the finished interface supports careful reading",
         "1,738 × 29", "c43c3f995b1f301b4328c846eab2cf27",
         "0.0953", "-0.0120", "0.1999", "0.960", "0.090",
+        "All eight Plotly outputs use dependency-aware caches",
+        "Wave 6 is complete and verified", "STOP AT THE WAVE 6 REVIEW GATE",
         "STOPPING POINT", "later review-gated waves", "have not been started",
         "Opponent_Elo", "Difficulty_Score", "Club_Goal", "Match Report",
     ]
@@ -1468,19 +1516,20 @@ def verify_docx(path: Path) -> None:
         )
     assert "w:tblHeader" in document_xml, "Repeated table headers are missing"
     assert " PAGE " in footer_xml, "Page-number field is missing"
-    assert document_xml.count('w:val="Heading1"') >= 28, "Heading hierarchy is incomplete"
+    assert document_xml.count('w:val="Heading1"') >= 29, "Heading hierarchy is incomplete"
 
 
 def main() -> None:
     facts = extract_facts()
     verify_facts(facts)
+    verify_wave6_sources()
     doc = build_document(facts)
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     doc.save(OUTPUT)
     verify_docx(OUTPUT)
     print(f"Created and verified: {OUTPUT}")
     print("Facts: 1,738 goals; 2,201 appearances; 181,081 minutes; 1,063 scoreless appearances")
-    print("Scope: verified through Wave 5; Wave 6 and later work explicitly not completed")
+    print("Scope: verified through Wave 6; Wave 7 and later work explicitly not completed")
 
 
 if __name__ == "__main__":

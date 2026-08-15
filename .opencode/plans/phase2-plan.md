@@ -1,6 +1,6 @@
 # Phase 2 — Interactive Dashboard (Messi vs Ronaldo)
 
-Status: **Paused at the fully verified Wave 6 review gate; resume with Wave 7 only after a new user instruction** (user-approved wave-by-wave review model).
+Status: **Phase 2 is complete: Wave 8 is deployed, documented, and approved for final GitHub commit/push** (user-approved wave-by-wave review model).
 Phase 1 complete: `a3c0a7f` (pipeline) + `016ff08` (docs). Working tree clean at start of Phase 2.
 
 ## Deliverable
@@ -73,7 +73,7 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 - Age-aligned or calendar-date trajectories show cumulative selected-K weighted index or rolling 30-filtered-appearance weighted index per 90. Age uses fixed birth-date display metadata and shows an age-30 guide only on the age axis.
 - The opponent-Elo view keeps one unjittered marker per eligible goal and overlays guarded, descriptive player LOESS curves without bins, confidence bands, or inference.
 - The penalty-dependency chart always discloses raw penalty/open-play counts and shares. Excluded penalty segments remain visible but muted while headline, trajectory, and Elo views follow the penalty toggle.
-- Missing difficulty, centred negative index values, filtered denominators, sparse scopes, descriptive LOESS, and the absence of Wave 4 confidence intervals are disclosed in the UI.
+- Missing difficulty, centred negative index values, filtered denominators, sparse scopes, descriptive LOESS, and the separation between descriptive Head-to-Head views and button-triggered Inference uncertainty are disclosed in the UI.
 - Bundle/schema/dependencies/FAMD remain unchanged; the stylesheet cache token is `css.css?v=20260812-wave3`.
 - Source, interaction, HTTP, and live-browser checks passed at 1919×862 and 390×844 with no overflow or Shiny output errors. Exact verification values and representative-filter results are in `.opencode/plans/phase2-handoff.md`.
 
@@ -103,8 +103,11 @@ A bslib Shiny dashboard (`app/`, port 3838) comparing Messi vs Ronaldo on **weig
 - All eight Plotly outputs across Weighting, Head-to-Head, and Inference are wrapped in `shiny::bindCache()`. The Inference density key uses the bundle build stamp and the frozen K/penalty/competition/venue snapshot.
 - The analysis sidebar opens on desktop and initializes collapsed on mobile. Safe-area padding, internal wide-table scrolling, narrow formula containment, explicit focus rings, compact Plotly modebars, and reduced-motion overrides complete the responsive pass.
 - Versioned local `app.js?v=20260812-wave6` adds a keyboard skip link/main focus target and debounced polite loading announcements without external assets.
-- Versioned CSS is `css.css?v=20260812-wave6`. The bundle schema, source data, global FAMD, module APIs, signed-power formula, all-valid-minute denominators, and six-package runtime remain unchanged.
+- Versioned CSS is `css.css?v=20260815-review1`. A user-review repair makes the brand, inactive tabs, active tab, and mobile navigation control explicit against the white navbar; the bundle schema, source data, global FAMD, module APIs, signed-power formula, all-valid-minute denominators, and six-package runtime remain unchanged.
 - Wave 4, Wave 5, and new Wave 6 regressions pass. Browser checks cover all tabs at 1919×862 and 390×844 plus 768×1024 and 320×700 containment, native loading feedback, keyboard skip-link activation, zero console warnings/errors, and HTTP 200 for root/CSS/JS/portrait.
+- A user-requested 2026-08-15 documentation refresh extends the teaching guide to a 30th page covering Wave 6 without changing the analysis. Matching editable Word and distribution PDF files are retained under `output/word/` and `output/pdf/`; text, geometry, page bounds, pagination, embedded fonts, and every rendered page were rechecked.
+- The reusable `$simple-explanation-docs` skill is retained project-locally under `.agents/skills/` and installed identically at `C:/Users/TOSHIBA/.codex/skills/simple-explanation-docs/`. Its official metadata validator and its paired-document validator both pass.
+- The 2026-08-15 local review walkthrough verified all seven pages at 1919×862, the 390×844 navigation menu, live K/penalty/competition/venue controls, button-gated Inference, Summary, Raw Data search, zero page overflow, and zero browser-console errors. The app remains at the Wave 6 review gate.
 
 ### ~~Wave 7.0 — Repair `renv.lock`~~ — RESOLVED 2026-08-09 by removing renv
 
@@ -114,16 +117,51 @@ the container needs six packages and never runs FAMD, so the precomputed `.rds` 
 delivers what the lockfile was meant to guarantee. Wave 7 is no longer blocked.
 
 ### Wave 7 — Docker
-- `Dockerfile` (rocker/shiny-verse:4.5.0 pinned, multi-stage, non-root, HEALTHCHECK, port 3838) + `.dockerignore`; include only bundle + app; no worldfootballR/FactoMineR at runtime.
+- **Complete and verified 2026-08-15; awaiting review.** `Dockerfile`
+  (`rocker/shiny-verse:4.5.0` pinned by digest, multi-stage, non-root,
+  HEALTHCHECK, port 3838) + `.dockerignore`; app-only context; no
+  worldfootballR/FactoMineR at runtime.
 - **Package install pins by dated Posit PPM snapshot, not renv.** Frozen date = reproducible, and PPM serves precompiled Linux binaries so the layer builds fast:
   ```dockerfile
   RUN R -e 'options(repos = "https://packagemanager.posit.co/cran/2026-08-09"); \
             install.packages(c("shiny","bslib","data.table","htmltools","plotly","DT"))'
   ```
-- Those six are the entire runtime. Verify by building and hitting `http://localhost:3838` — do not assume the list; if a module gains a dependency in Waves 2–6, add it here and to `R/_packages.R`.
+- Those six are the entire runtime. The verified image was 786,851,392 bytes,
+  ran as UID/GID 997 with constrained resources and dropped capabilities, and
+  passed package, HTTP, browser, data-contract, and Wave 4–7 regression checks.
+- The disposable C: build context and every identified Wave 7 container/image/
+  builder/browser artifact were removed after verification. Canonical source
+  remains only at `D:\MessivsRonaldoR`; Docker Desktop itself remains installed.
+- The Wave 7 gate was respected. Wave 8 began only after a later explicit user
+  instruction; no commit or push was made.
 
 ### Wave 8 — Deploy
-- `scripts/09_deploy_shinyapps.R` (rsconnect), deploy, verify live URL.
+- `scripts/09_deploy_shinyapps.R` builds a strict 24-file rsconnect allowlist,
+  verifies the six-package runtime manifest, rejects development packages and
+  secrets, selects one configured shinyapps.io account, prevents unlinked app
+  overwrites, and deploys the fixed app name `messi-vs-ronaldo-r`.
+- `tests/wave8_deployment_checks.R` passes: 24 files, 1,971,888 bytes, exact
+  source CSV hash, unchanged bundle schema/counts/minutes, finite signed power,
+  six required packages present, and development-only packages absent.
+- The public application is deployed at
+  `https://qqxot9-batest-hommie.shinyapps.io/messi-vs-ronaldo-r/` with content
+  ID `17705139`. The retained ignored rsconnect record links later updates to
+  that application; credentials remain only in the user's rsconnect store.
+- Root, versioned CSS/JavaScript, and both portraits return HTTP 200. All seven
+  pages, live controls, the frozen 10,000-resample Inference workflow, Summary,
+  and Raw Data search were verified on the hosted app. Desktop 1919x862 and
+  mobile 390x844 have exact viewport-width documents, no Shiny output errors,
+  and zero browser-console warnings/errors.
+- A live-review copy defect in Head-to-Head was corrected from future-tense
+  Wave 4 wording to a direct link to the implemented Inference workflow, then
+  redeployed and rechecked. The final linked update is bundle `12413528`.
+- The user accepted the public experience and explicitly authorized the final
+  GitHub documentation commit/push. The public app remains live.
+- The repository landing page links the live app, retained PDF/Word study
+  guide, architecture, verified results, setup, tests, Docker/deployment
+  workflows, limitations, and four public-app screenshots.
+- Keep per-account `app/rsconnect/` records local and ignored so later
+  deployments update only the linked application.
 
 ## Gotchas (carrying from Phase 1)
 

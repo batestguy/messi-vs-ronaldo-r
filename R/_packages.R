@@ -21,6 +21,9 @@ library(htmltools)
 library(plotly)          # loaded lazily inside mod_weighting / mod_head2head
 library(DT)              # loaded lazily inside mod_data
 
+# === Deployment (local only -- never part of the app runtime) ==============
+library(rsconnect)       # Wave 8 manifest creation + shinyapps.io publishing
+
 # === Analysis (local only -- builds the bundle, never runs in the container) =
 library(FactoMineR)      # FAMD. Its version determines the Dim-1 loadings, so
                          # scripts/08 records packageVersion() into bundle$meta.

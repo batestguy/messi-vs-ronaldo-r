@@ -2355,11 +2355,42 @@ button,
   padding-top: max(var(--bs-navbar-padding-y), env(safe-area-inset-top));
 }
 
+.navbar .navbar-brand,
+.navbar .navbar-brand:visited {
+  color: var(--ink);
+}
+
+.navbar .navbar-brand:hover,
+.navbar .navbar-brand:focus {
+  color: var(--messi);
+}
+
 .navbar .nav-link {
+  color: #43576a;
   transition:
     color 120ms ease,
     background-color 120ms ease,
     box-shadow 120ms ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: var(--messi);
+}
+
+.navbar .nav-link.active,
+.navbar .nav-link[aria-selected="true"] {
+  color: #1c7c7d;
+}
+
+.navbar .navbar-toggle,
+.navbar .navbar-toggler {
+  color: var(--ink);
+  border-color: rgba(23, 32, 42, .24);
+}
+
+.navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2823,32,42,0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 .sidebar,

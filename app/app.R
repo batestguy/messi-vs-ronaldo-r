@@ -125,7 +125,7 @@ ui <- page_navbar(
       ),
       tags$link(
         rel = "stylesheet",
-        href = "css.css?v=20260812-wave6"
+        href = "css.css?v=20260815-review1"
       ),
       tags$script(src = "app.js?v=20260812-wave6", defer = NA)
     ),
