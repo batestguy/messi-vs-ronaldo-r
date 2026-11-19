@@ -13,6 +13,19 @@ the complete valid-minute denominator — including scoreless appearances.
 · **[Read the illustrated study guide](output/pdf/Messi_vs_Ronaldo_Statistics_Explained.pdf)**
 · **[Explore the architecture](docs/ARCHITECTURE.md)**
 
+## Walkthrough video
+
+[![Watch the dashboard walkthrough](docs/demo/01_cover.jpg)](docs/demo/messi_vs_ronaldo_demo.mp4)
+
+[![Download the walkthrough MP4 — 4:17, 23 MB](https://img.shields.io/badge/Download_MP4-4%3A17_%C2%B7_23_MB-1C7C7D?style=for-the-badge&logo=vlcmediaplayer&logoColor=white)](docs/demo/messi_vs_ronaldo_demo.mp4?raw=true)
+
+A 4:17 tour of every page and every control, with on-screen captions explaining
+each result in plain words (no voiceover). Background music: Mauvais Djo —
+*Maladie* (gospel version) into *Pilé* (gospel version by Kano Choir).
+
+Built and maintained by [@batestguy](https://github.com/batestguy) —
+follow along at **[github.com/batestguy](https://github.com/batestguy)**.
+
 ![Dashboard Overview showing both player profiles and the fixed career baseline](docs/screenshots/overview-desktop.png)
 
 ## Why this project exists
