@@ -5,9 +5,20 @@ Ronaldo using difficulty-adjusted scoring rates, transparent uncertainty, and
 the complete valid-minute denominator — including scoreless appearances.
 
 [![Live dashboard](https://img.shields.io/badge/Live_dashboard-open-1C7C7D)](https://qqxot9-batest-hommie.shinyapps.io/messi-vs-ronaldo-r/)
-[![R](https://img.shields.io/badge/R-4.5.2-276DC3?logo=r)](https://www.r-project.org/)
-[![Shiny](https://img.shields.io/badge/Shiny-bslib-1C7C7D)](https://shiny.posit.co/)
-[![Docker](https://img.shields.io/badge/Docker-reproducible-2496ED?logo=docker)](DOCKER.md)
+[![R 4.5.2](https://img.shields.io/badge/R-4.5.2-276DC3?logo=r&logoColor=white)](https://github.com/topics/r)
+
+[![shiny](https://img.shields.io/badge/shiny-1C7C7D?style=flat-square)](https://github.com/topics/shiny)
+[![rstats](https://img.shields.io/badge/rstats-1C7C7D?style=flat-square)](https://github.com/topics/rstats)
+[![football](https://img.shields.io/badge/football-1C7C7D?style=flat-square)](https://github.com/topics/football)
+[![soccer](https://img.shields.io/badge/soccer-1C7C7D?style=flat-square)](https://github.com/topics/soccer)
+[![sports-analytics](https://img.shields.io/badge/sports--analytics-1C7C7D?style=flat-square)](https://github.com/topics/sports-analytics)
+[![messi](https://img.shields.io/badge/messi-1C7C7D?style=flat-square)](https://github.com/topics/messi)
+[![cristiano-ronaldo](https://img.shields.io/badge/cristiano--ronaldo-1C7C7D?style=flat-square)](https://github.com/topics/cristiano-ronaldo)
+[![famd](https://img.shields.io/badge/famd-1C7C7D?style=flat-square)](https://github.com/topics/famd)
+[![statistical-inference](https://img.shields.io/badge/statistical--inference-1C7C7D?style=flat-square)](https://github.com/topics/statistical-inference)
+[![reproducible-research](https://img.shields.io/badge/reproducible--research-1C7C7D?style=flat-square)](https://github.com/topics/reproducible-research)
+[![data-visualization](https://img.shields.io/badge/data--visualization-1C7C7D?style=flat-square)](https://github.com/topics/data-visualization)
+[![docker](https://img.shields.io/badge/docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://github.com/topics/docker)
 
 **[Open the public dashboard](https://qqxot9-batest-hommie.shinyapps.io/messi-vs-ronaldo-r/)**
 · **[Read the illustrated study guide](output/pdf/Messi_vs_Ronaldo_Statistics_Explained.pdf)**
